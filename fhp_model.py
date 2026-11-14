@@ -10,7 +10,7 @@ import sys, time, shutil, random
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 OBSTACLE_RADIUS = 12
-OBSTACLE_SHAPE = "circle"
+OBSTACLE_SHAPE = "square"
 COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
@@ -141,11 +141,11 @@ def neighbourhood(x: int, y: int, rows: int, cols: int, wraprows: bool = False, 
 
 def obstacle(dx: int, dy: int, shape: str = OBSTACLE_SHAPE):
     match shape:
-        case "circle":
+        case "circle":  # Euclidian distance
             return abs(dx)**2 + abs(dy)**2 <= OBSTACLE_RADIUS**2
-        case "square":
-            return abs(dx) <= OBSTACLE_RADIUS and abs(dy) <= OBSTACLE_RADIUS
-        case "diamond":
+        case "square":  # Chebyshev distance
+            return max(abs(dx), abs(dy)) <= OBSTACLE_RADIUS
+        case "diamond":  # Manhattan distance
             return abs(dx) + abs(dy) <= OBSTACLE_RADIUS
         case _:
             return False
