@@ -18,9 +18,9 @@ PARTICLE_DENSITY = [
     "%%",
     "@@",
 ]
-DELAY_SECONDS = 0.05
+DELAY_SECONDS = 0.5
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 12
+OBSTACLE_RADIUS = 20
 COLOUR_SCHEME = False
 
 
@@ -138,7 +138,7 @@ def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, 
     return neighbours
 
 
-def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "square"):
+def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "circle"):
     cx, cy = rows//2, cols//2
     match mode:
         case "circle":
@@ -171,7 +171,7 @@ def transport_step(grid: list[list[FHPChannel]]):
         return (
             0 <= x < rows
             and 0 <= y < cols
-            and not obstacle(x, y, rows, cols, "")
+            and not obstacle(x, y, rows, cols, "circle")
         )
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
