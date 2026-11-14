@@ -124,7 +124,7 @@ def random_world(rows: int, cols: int, seed: list[int], smoothing: int = 2) -> l
 
 def main():
     size = shutil.get_terminal_size()
-    ROWS = size.lines
+    ROWS = size.lines-1
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
     seed = [0,1]
