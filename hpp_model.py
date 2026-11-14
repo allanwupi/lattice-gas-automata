@@ -5,13 +5,13 @@ Square lattice: 4 velocities
 '''
 from enum import IntFlag, auto
 from collections import Counter
-from random import choice, random
-import sys, time, shutil
+import sys, time, shutil, random
 
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 BLOCK_GRAPHICS = False
+COLOUR_SCHEME = True
 PARTICLE_DENSITY = [
     "  ",
     "░░",
@@ -100,8 +100,8 @@ def display_grid(grid: list[list[Channel]], shade: bool = False):
         print()
 
 
-def random_world(rows: int, cols: int, seed: list[int], smoothing: int = 2) -> list[list[Channel]]:
-    grid = [[Channel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
+def random_world(rows: int, cols: int, spawn: list[int], smoothing: int = 2) -> list[list[Channel]]:
+    grid = [[Channel(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
     # Repeatedly apply a majority filter to produce smooth blobs
     for _ in range(smoothing):
         updated = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
@@ -115,8 +115,8 @@ def random_world(rows: int, cols: int, seed: list[int], smoothing: int = 2) -> l
                         if 0 <= ii < rows and 0 <= jj < cols:
                             neighbors.append(grid[ii][jj])
                 # Add occasional noise to prevent uniform results
-                if random() < 0.1:
-                    updated[i][j] = Channel(choice(seed))
+                if random.random() < 0.1:
+                    updated[i][j] = Channel(random.choice(spawn))
                 else:
                     updated[i][j] = Counter(neighbors).most_common(1)[0][0]
         grid = updated
@@ -128,12 +128,12 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    seed = [0,1,1,1]
+    spawn = [0,1,1,1]
     if len(sys.argv) > 1:
-        seed = [int(x, 16) for x in sys.argv[1]]
-    world = random_world(ROWS, COLS, seed=seed)
-    #if BLOCK_GRAPHICS:
-        #print("\x1b[1;94;44m")
+        spawn = [int(x, 16) for x in sys.argv[1]]
+    world = random_world(ROWS, COLS, spawn=spawn)
+    if COLOUR_SCHEME:
+        print("\x1b[1;94;44m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
@@ -146,7 +146,7 @@ def main():
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
         print(CLEAR_LINE*ROWS, end="")
-    #print("\x1b[0m")
+    print("\x1b[0m")
 
 
 if __name__ == "__main__":

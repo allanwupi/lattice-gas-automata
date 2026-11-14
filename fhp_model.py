@@ -5,8 +5,8 @@ Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
 from enum import IntFlag, auto
 from collections import Counter
-from random import choice, random
-import sys, time, shutil
+import sys, time, shutil, random
+
 
 PARTICLE_DENSITY = [
     "  ",
@@ -21,6 +21,7 @@ PARTICLE_DENSITY = [
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 OBSTACLE_RADIUS = 11
+COLOUR_SCHEME = False
 
 
 # REST E NE NW W SW SE
@@ -135,6 +136,17 @@ def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, 
         neighbours[FHPChannel.SW] = wraparound(i+1,j)
         neighbours[FHPChannel.SE] = wraparound(i+1,j+1)
     return neighbours
+
+
+def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "circle"):
+    cx, cy = rows//2, cols//2
+    match mode:
+        case "circle":
+            return abs(i-cx)**2 + abs(j-cy)**2 <= OBSTACLE_RADIUS**2
+        case "square":
+            return abs(i-cx) <= OBSTACLE_RADIUS and abs(j-cy) <= OBSTACLE_RADIUS
+        case _:
+            return False
     
 
 def collision_step(grid: list[list[FHPChannel]]) -> None:
@@ -144,7 +156,7 @@ def collision_step(grid: list[list[FHPChannel]]) -> None:
             out_states = COLLISION_RULES.get(cell, None)
             if out_states is not None:
                 if isinstance(out_states, list):
-                    next_state = FHPChannel(choice(out_states))
+                    next_state = FHPChannel(random.choice(out_states))
                 else:
                     next_state = FHPChannel(out_states)
             grid[i][j] = next_state
@@ -159,7 +171,7 @@ def transport_step(grid: list[list[FHPChannel]]):
         return (
             0 <= x < rows
             and 0 <= y < cols
-            and abs(x-cx)**2 + abs(y-cy)**2 >= OBSTACLE_RADIUS**2
+            and not obstacle(x, y, rows, cols)
         )
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
@@ -206,22 +218,26 @@ def transport_step(grid: list[list[FHPChannel]]):
 
                    
 def display_grid(grid: list[list[FHPChannel]]):
+    rows, cols = len(grid), len(grid[0])
     for i, row in enumerate(grid):
         if i % 2 == 1:  # Odd row, offset by half
             print(" ", end="")
-        for cell in row:
+        for j, cell in enumerate(row):
+            if obstacle(i, j, rows, cols):
+                print("  ", end="")
+                continue
             print(cell, end="")
         print()
 
 
-def random_world(rows: int, cols: int, seed: list[int]) -> list[list[FHPChannel]]:
-    grid = [[FHPChannel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
+def random_world(rows: int, cols: int, spawn: list[int]) -> list[list[FHPChannel]]:
+    grid = [[FHPChannel(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
     cx, cy = rows//2, cols//2
     # Apply a majority filter to produce smooth blobs
     smoothed = [[FHPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
     for i in range(rows):
         for j in range(cols):
-            if abs(i-cx)**2 + abs(j-cy)**2 <= OBSTACLE_RADIUS**2:
+            if obstacle(i, j, rows, cols):
                 smoothed[i][j] = FHPChannel.EMPTY
                 continue
             neighbors = []
@@ -232,8 +248,8 @@ def random_world(rows: int, cols: int, seed: list[int]) -> list[list[FHPChannel]
                     if 0 <= ii < rows and 0 <= jj < cols:
                         neighbors.append(grid[ii][jj])
             # Add occasional noise to prevent uniform results
-            if random() < 0.1:
-                smoothed[i][j] = FHPChannel(choice(seed))
+            if random.random() < 0.1:
+                smoothed[i][j] = FHPChannel(random.choice(spawn))
             else:
                 smoothed[i][j] = Counter(neighbors).most_common(1)[0][0]
     return smoothed
@@ -244,16 +260,18 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    seed = [0, 4, 4, 4, 4]
+    spawn = [0, 4, 4, 4, 4]
     if len(sys.argv) > 1:
-        seed = []
+        spawn = []
         for x in sys.argv[1:]:
             value = int(x)
             if value == 0:
-                seed.extend([0]*len(x))
+                spawn.extend([0]*len(x))
             else:
-                seed.append(value)
-    world = random_world(ROWS, COLS, seed)
+                spawn.append(value)
+    world = random_world(ROWS, COLS, spawn)
+    if COLOUR_SCHEME:
+        print("\x1b[1;44m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
@@ -266,6 +284,7 @@ def main():
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
         print(CLEAR_LINE*ROWS, end="")
+    print("\x1b[0m")
 
 
 if __name__ == "__main__":
