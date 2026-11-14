@@ -13,10 +13,10 @@ MAX_SIMULATION_TICKS = 1200
 OBSTACLE_RADIUS = 12
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
+DRAW_ARROWS = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
-    #": ",
     "::",
     "++",
     "**",
@@ -24,7 +24,6 @@ PARTICLE_DENSITY = [
     "@@",
     "$$",
 ]
-
 
 # REST E NE NW W SW SE
 COLLISION_RULES = {
@@ -113,12 +112,14 @@ class FHPChannel(IntFlag):
     REST = auto()
 
     def __str__(self) -> str:
-        #if self == FHPChannel.NW: return "↖ "
-        #if self == FHPChannel.NE: return " ↗"
-        #if self == FHPChannel.SE: return " ↘"
-        #if self == FHPChannel.SW: return "↙ "
-        #if self == FHPChannel.E: return "→ "
-        #if self == FHPChannel.W: return " ←"
+        if DRAW_ARROWS:
+            match self:
+                case FHPChannel.NW: return "↖ "
+                case FHPChannel.NE: return " ↗"
+                case FHPChannel.SE: return " ↘"
+                case FHPChannel.SW: return "↙ "
+                case FHPChannel.E: return "→ "
+                case FHPChannel.W: return " ←"
         return PARTICLE_DENSITY[len(self)]
 
 
