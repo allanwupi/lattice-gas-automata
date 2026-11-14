@@ -11,7 +11,7 @@ import sys, time, shutil, random
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 BLOCK_GRAPHICS = False
-COLOUR_SCHEME = True
+COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
     "░░",

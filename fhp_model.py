@@ -9,8 +9,8 @@ import sys, time, shutil, random
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 12
-OBSTACLE_SHAPE = "square"
+OBSTACLE_RADIUS = 15
+OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
