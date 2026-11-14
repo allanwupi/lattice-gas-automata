@@ -10,8 +10,8 @@ import sys, time, shutil
 
 
 DELAY_SECONDS = 0.05
-MAX_SIMULATION_TICKS = 600
-BLOCK_GRAPHICS = True
+MAX_SIMULATION_TICKS = 1200
+BLOCK_GRAPHICS = False
 PARTICLE_DENSITY = [
     "  ",
     "░░",
@@ -128,7 +128,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    seed = [0,1]
+    seed = [0,1,1,1]
     if len(sys.argv) > 1:
         seed = [int(x, 16) for x in sys.argv[1]]
     world = random_world(ROWS, COLS, seed=seed)
