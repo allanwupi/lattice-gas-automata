@@ -30,16 +30,23 @@ class Channel(IntFlag):
 ```
 
 ## FHP Model
-Requires a hex grid (not yet implemented).
+Uses a hexagonal lattice.
+
+Optionally specify a list of digits for initial particle probabilities.
+- 0 = EMPTY (none)
+- 1 = NORTH (up)
+- 2 = SOUTH (down)
+- 4 = EAST (right)
+- 8 = WEST (left)
 
 ```python
 class FHPChannel(Flag):
     EMPTY = 0
-    REST = auto()
-    E = auto()
-    NE = auto()
-    NW = auto()
-    W = auto()
-    SW = auto()
     SE = auto()
+    SW = auto()
+    W = auto()
+    NW = auto()
+    NE = auto()
+    E = auto()
+    REST = auto()
 ```
