@@ -7,7 +7,11 @@ from enum import IntFlag, auto
 from collections import Counter
 import sys, time, shutil, random
 
-
+DELAY_SECONDS = 0.05
+MAX_SIMULATION_TICKS = 1200
+OBSTACLE_RADIUS = 20
+OBSTACLE_SHAPE = "circle"
+COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
@@ -18,10 +22,6 @@ PARTICLE_DENSITY = [
     "%%",
     "@@",
 ]
-DELAY_SECONDS = 0.5
-MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 20
-COLOUR_SCHEME = False
 
 
 # REST E NE NW W SW SE
@@ -114,7 +114,7 @@ class FHPChannel(IntFlag):
         return PARTICLE_DENSITY[len(self)]
 
 
-def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = True) -> dict[FHPChannel, tuple[int, int]]:
+def neighbourhood(x: int, y: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = True) -> dict[FHPChannel, tuple[int, int]]:
     def wraparound(ii: int, jj: int):
         if wraprows:
             ii = (ii+rows) % rows
@@ -122,36 +122,37 @@ def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, 
             jj = (jj+cols) % cols
         return (ii, jj)
     neighbours = {
-        FHPChannel.W: wraparound(i,j-1),
-        FHPChannel.E: wraparound(i,j+1)
+        FHPChannel.W: wraparound(x,y-1),
+        FHPChannel.E: wraparound(x,y+1)
     }
-    if i % 2 == 0:  # Even rows
-        neighbours[FHPChannel.NW] = wraparound(i-1,j-1)
-        neighbours[FHPChannel.NE] = wraparound(i-1,j)
-        neighbours[FHPChannel.SW] = wraparound(i+1,j-1)
-        neighbours[FHPChannel.SE] = wraparound(i+1,j)
+    if x % 2 == 0:  # Even rows
+        neighbours[FHPChannel.NW] = wraparound(x-1,y-1)
+        neighbours[FHPChannel.NE] = wraparound(x-1,y)
+        neighbours[FHPChannel.SW] = wraparound(x+1,y-1)
+        neighbours[FHPChannel.SE] = wraparound(x+1,y)
     else:  # Odd rows
-        neighbours[FHPChannel.NW] = wraparound(i-1,j)
-        neighbours[FHPChannel.NE] = wraparound(i-1,j+1)
-        neighbours[FHPChannel.SW] = wraparound(i+1,j)
-        neighbours[FHPChannel.SE] = wraparound(i+1,j+1)
+        neighbours[FHPChannel.NW] = wraparound(x-1,y)
+        neighbours[FHPChannel.NE] = wraparound(x-1,y+1)
+        neighbours[FHPChannel.SW] = wraparound(x+1,y)
+        neighbours[FHPChannel.SE] = wraparound(x+1,y+1)
     return neighbours
 
 
-def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "circle"):
-    cx, cy = rows//2, cols//2
-    match mode:
+def obstacle(dx: int, dy: int, shape: str = OBSTACLE_SHAPE):
+    match shape:
         case "circle":
-            return abs(i-cx)**2 + abs(j-cy)**2 <= OBSTACLE_RADIUS**2
+            return abs(dx)**2 + abs(dy)**2 <= OBSTACLE_RADIUS**2
         case "square":
-            return abs(i-cx) <= OBSTACLE_RADIUS and abs(j-cy) <= OBSTACLE_RADIUS
+            return abs(dx) <= OBSTACLE_RADIUS and abs(dy) <= OBSTACLE_RADIUS
+        case "diamond":
+            return abs(dx) + abs(dy) <= OBSTACLE_RADIUS
         case _:
             return False
     
 
 def collision_step(grid: list[list[FHPChannel]]) -> None:
-    for i, row in enumerate(grid):
-        for j, cell in enumerate(row):
+    for x, row in enumerate(grid):
+        for y, cell in enumerate(row):
             next_state = cell
             out_states = COLLISION_RULES.get(cell, None)
             if out_states is not None:
@@ -159,7 +160,7 @@ def collision_step(grid: list[list[FHPChannel]]) -> None:
                     next_state = FHPChannel(random.choice(out_states))
                 else:
                     next_state = FHPChannel(out_states)
-            grid[i][j] = next_state
+            grid[x][y] = next_state
 
 
 def transport_step(grid: list[list[FHPChannel]]):
@@ -171,55 +172,55 @@ def transport_step(grid: list[list[FHPChannel]]):
         return (
             0 <= x < rows
             and 0 <= y < cols
-            and not obstacle(x, y, rows, cols, "circle")
+            and not obstacle(x-cx, y-cy)
         )
-    for i, line in enumerate(grid):
-        for j, cell in enumerate(line):
-            neighbours = neighbourhood(i, j, rows, cols)
+    for x, line in enumerate(grid):
+        for y, cell in enumerate(line):
+            neighbours = neighbourhood(x, y, rows, cols)
             if FHPChannel.E in cell:
-                ii, jj = neighbours[FHPChannel.E]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.E
+                xx, yy = neighbours[FHPChannel.E]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.E
                 else:
-                    update[i][j] |= FHPChannel.W
+                    update[x][y] |= FHPChannel.W
             if FHPChannel.NE in cell:
-                ii, jj = neighbours[FHPChannel.NE]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.NE
+                xx, yy = neighbours[FHPChannel.NE]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.NE
                 else:
-                    update[i][j] |= FHPChannel.SW
+                    update[x][y] |= FHPChannel.SW
             if FHPChannel.NW in cell:
-                ii, jj = neighbours[FHPChannel.NW]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.NW
+                xx, yy = neighbours[FHPChannel.NW]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.NW
                 else:
-                    update[i][j] |= FHPChannel.SE
+                    update[x][y] |= FHPChannel.SE
             if FHPChannel.W in cell:
-                ii, jj = neighbours[FHPChannel.W]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.W
+                xx, yy = neighbours[FHPChannel.W]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.W
                 else:
-                    update[i][j] |= FHPChannel.E
+                    update[x][y] |= FHPChannel.E
             if FHPChannel.SW in cell:
-                ii, jj = neighbours[FHPChannel.SW]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.SW
+                xx, yy = neighbours[FHPChannel.SW]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.SW
                 else:
-                    update[i][j] |= FHPChannel.NE
+                    update[x][y] |= FHPChannel.NE
             if FHPChannel.SE in cell:
-                ii, jj = neighbours[FHPChannel.SE]
-                if within_bounds((ii,jj)):
-                    update[ii][jj] |= FHPChannel.SE
+                xx, yy = neighbours[FHPChannel.SE]
+                if within_bounds((xx,yy)):
+                    update[xx][yy] |= FHPChannel.SE
                 else:
-                    update[i][j] |= FHPChannel.NW
+                    update[x][y] |= FHPChannel.NW
             if FHPChannel.REST in cell:
-                update[i][j] |= FHPChannel.REST
+                update[x][y] |= FHPChannel.REST
     return update
 
                    
 def display_grid(grid: list[list[FHPChannel]]):
-    for i, row in enumerate(grid):
-        if i % 2 == 1:  # Odd row, offset by half
+    for x, row in enumerate(grid):
+        if x % 2 == 1:  # Odd row, offset by half
             print(" ", end="")
         for cell in row:
             print(cell, end="")
@@ -231,23 +232,23 @@ def random_world(rows: int, cols: int, spawn: list[int]) -> list[list[FHPChannel
     cx, cy = rows//2, cols//2
     # Apply a majority filter to produce smooth blobs
     smoothed = [[FHPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
-    for i in range(rows):
-        for j in range(cols):
-            if obstacle(i, j, rows, cols):
-                smoothed[i][j] = FHPChannel.EMPTY
+    for x in range(rows):
+        for y in range(cols):
+            if obstacle(x-cx, y-cy):
+                smoothed[x][y] = FHPChannel.EMPTY
                 continue
             neighbors = []
-            for dr in (-1, 0, 1):
-                for dc in (-1, 0, 1):
-                    ii = i + dr
-                    jj = j + dc
-                    if 0 <= ii < rows and 0 <= jj < cols:
-                        neighbors.append(grid[ii][jj])
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    xx = x + dx
+                    yy = y + dy
+                    if 0 <= xx < rows and 0 <= yy < cols:
+                        neighbors.append(grid[xx][yy])
             # Add occasional noise to prevent uniform results
             if random.random() < 0.1:
-                smoothed[i][j] = FHPChannel(random.choice(spawn))
+                smoothed[x][y] = FHPChannel(random.choice(spawn))
             else:
-                smoothed[i][j] = Counter(neighbors).most_common(1)[0][0]
+                smoothed[x][y] = Counter(neighbors).most_common(1)[0][0]
     return smoothed
 
 
