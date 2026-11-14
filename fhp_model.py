@@ -113,21 +113,27 @@ class FHPChannel(IntFlag):
         return PARTICLE_DENSITY[len(self)]
 
 
-def neighbourhood(i: int, j: int) -> dict[FHPChannel, tuple[int, int]]:
+def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = True) -> dict[FHPChannel, tuple[int, int]]:
+    def wraparound(ii: int, jj: int):
+        if wraprows:
+            ii = (ii+rows) % rows
+        if wrapcols:
+            jj = (jj+cols) % cols
+        return (ii, jj)
     neighbours = {
-        FHPChannel.W: (i,j-1),
-        FHPChannel.E: (i,j+1)
+        FHPChannel.W: wraparound(i,j-1),
+        FHPChannel.E: wraparound(i,j+1)
     }
     if i % 2 == 0:  # Even rows
-        neighbours[FHPChannel.NW] = (i-1,j-1)
-        neighbours[FHPChannel.NE] = (i-1,j)
-        neighbours[FHPChannel.SW] = (i+1,j-1)
-        neighbours[FHPChannel.SE] = (i+1,j)
+        neighbours[FHPChannel.NW] = wraparound(i-1,j-1)
+        neighbours[FHPChannel.NE] = wraparound(i-1,j)
+        neighbours[FHPChannel.SW] = wraparound(i+1,j-1)
+        neighbours[FHPChannel.SE] = wraparound(i+1,j)
     else:  # Odd rows
-        neighbours[FHPChannel.NW] = (i-1,j)
-        neighbours[FHPChannel.NE] = (i-1,j+1)
-        neighbours[FHPChannel.SW] = (i+1,j)
-        neighbours[FHPChannel.SE] = (i+1,j+1)
+        neighbours[FHPChannel.NW] = wraparound(i-1,j)
+        neighbours[FHPChannel.NE] = wraparound(i-1,j+1)
+        neighbours[FHPChannel.SW] = wraparound(i+1,j)
+        neighbours[FHPChannel.SE] = wraparound(i+1,j+1)
     return neighbours
     
 
@@ -157,40 +163,40 @@ def transport_step(grid: list[list[FHPChannel]]):
         )
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
-            neighbours = neighbourhood(i, j)
+            neighbours = neighbourhood(i, j, rows, cols)
             if FHPChannel.E in cell:
-                if within_bounds(neighbours[FHPChannel.E]):
-                    ii, jj = neighbours[FHPChannel.E]
+                ii, jj = neighbours[FHPChannel.E]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.E
                 else:
                     update[i][j] |= FHPChannel.W
             if FHPChannel.NE in cell:
-                if within_bounds(neighbours[FHPChannel.NE]):
-                    ii, jj = neighbours[FHPChannel.NE]
+                ii, jj = neighbours[FHPChannel.NE]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.NE
                 else:
                     update[i][j] |= FHPChannel.SW
             if FHPChannel.NW in cell:
-                if within_bounds(neighbours[FHPChannel.NW]):
-                    ii, jj = neighbours[FHPChannel.NW]
+                ii, jj = neighbours[FHPChannel.NW]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.NW
                 else:
                     update[i][j] |= FHPChannel.SE
             if FHPChannel.W in cell:
-                if within_bounds(neighbours[FHPChannel.W]):
-                    ii, jj = neighbours[FHPChannel.W]
+                ii, jj = neighbours[FHPChannel.W]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.W
                 else:
                     update[i][j] |= FHPChannel.E
             if FHPChannel.SW in cell:
-                if within_bounds(neighbours[FHPChannel.SW]):
-                    ii, jj = neighbours[FHPChannel.SW]
+                ii, jj = neighbours[FHPChannel.SW]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.SW
                 else:
                     update[i][j] |= FHPChannel.NE
             if FHPChannel.SE in cell:
-                if within_bounds(neighbours[FHPChannel.SE]):
-                    ii, jj = neighbours[FHPChannel.SE]
+                ii, jj = neighbours[FHPChannel.SE]
+                if within_bounds((ii,jj)):
                     update[ii][jj] |= FHPChannel.SE
                 else:
                     update[i][j] |= FHPChannel.NW
