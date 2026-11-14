@@ -1,11 +1,14 @@
-# Hardy–Pomeau–Pazzis (HPP) model
-# Square lattice: 4 velocities
+#!/usr/bin/env python3
+'''
+Hardy-Pomeau-Pazzis (HPP) model
+Square lattice: 4 velocities
+'''
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 600
 PARTICLE_DENSITY = " ░▒▓█"
 
-from enum import IntFlag, auto  # Note that len(flag_variable) returns the number of active bits
+from enum import IntFlag, auto
 
 class Channel(IntFlag):
     EMPTY = 0
@@ -29,7 +32,7 @@ def collision_step(grid: list[list[Channel]]) -> None:
                 grid[i][j] = (Channel.N | Channel.S)
 
 
-def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = False) -> list[list[Channel]]:
+def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = True) -> list[list[Channel]]:
     rows = len(grid)
     cols = len(grid[0])
     update = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
@@ -93,20 +96,21 @@ def main():
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
     seed = [0,1,1,1]
     if len(sys.argv) > 1:
-        seed = [int(x) for x in sys.argv[1]]
+        seed = [int(x, 16) for x in sys.argv[1]]
     world = random_world(ROWS, COLS, seed=seed)
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
             display_grid(world)
             collision_step(world)
-            world = transport_step(world, wraprows=False, wrapcols=False)
+            world = transport_step(world)
             delay = DELAY_SECONDS - time.perf_counter() + start
             if delay > 0:
                 time.sleep(delay)
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
-        pass
+        print(CLEAR_LINE*ROWS, end="")
+
 
 if __name__ == "__main__":
     main()

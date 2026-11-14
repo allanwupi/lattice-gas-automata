@@ -1,8 +1,10 @@
-# Frisch–Hasslacher–Pomeau (FHP) model
-# Hexagonal lattice: 7 velocities (6 directions + stationary)
+#!/usr/bin/env python3
+'''
+Frisch-Hasslacher-Pomeau (FHP) model
+Hexagonal lattice: 7 velocities (6 directions + stationary)
+'''
 
 from enum import Flag, auto
-# Note that len(flag_variable) returns the number of active bits
 
 class FHPChannel(Flag):
     EMPTY = 0

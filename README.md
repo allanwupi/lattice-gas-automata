@@ -13,12 +13,12 @@ python hpp_model.py [seed]
 
 Simulation runs at target 20 frames per second.
 
-Optionally specify a digit string for initial particle probabilities.
+Optionally specify a hex digit string for initial particle probabilities.
 - 0 = EMPTY (none)
 - 1 = NORTH (up)
 - 2 = SOUTH (down)
-- 3 = EAST (right)
-- 4 = WEST (left)
+- 4 = EAST (right)
+- 8 = WEST (left)
 
 ```python
 class Channel(IntFlag):
