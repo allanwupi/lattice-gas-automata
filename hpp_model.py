@@ -11,7 +11,7 @@ import sys, time, shutil
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-BLOCK_GRAPHICS = False
+BLOCK_GRAPHICS = True
 PARTICLE_DENSITY = [
     "  ",
     "░░",
@@ -132,8 +132,8 @@ def main():
     if len(sys.argv) > 1:
         seed = [int(x, 16) for x in sys.argv[1]]
     world = random_world(ROWS, COLS, seed=seed)
-    if BLOCK_GRAPHICS:
-        print("\x1b[1;94;44m")
+    #if BLOCK_GRAPHICS:
+        #print("\x1b[1;94;44m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
@@ -146,7 +146,7 @@ def main():
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
         print(CLEAR_LINE*ROWS, end="")
-    print("\x1b[0m")
+    #print("\x1b[0m")
 
 
 if __name__ == "__main__":
