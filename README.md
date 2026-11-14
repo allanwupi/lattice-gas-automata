@@ -34,10 +34,13 @@ Uses a hexagonal lattice.
 
 Optionally specify a list of digits for initial particle probabilities.
 - 0 = EMPTY (none)
-- 1 = NORTH (up)
-- 2 = SOUTH (down)
-- 4 = EAST (right)
-- 8 = WEST (left)
+- 1 = SOUTHEAST
+- 2 = SOUTHWEST
+- 4 = WEST
+- 8 = NORTHWEST
+- 16 = NORTHEAST
+- 32 = EAST
+- 64 = REST (stationary)
 
 ```python
 class FHPChannel(Flag):
