@@ -53,7 +53,7 @@ def collision_step(grid: list[list[Channel]]) -> None:
                 grid[i][j] = (Channel.N | Channel.S)
 
 
-def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = True) -> list[list[Channel]]:
+def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = False) -> list[list[Channel]]:
     rows, cols = len(grid), len(grid[0])
     update = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
     for i, line in enumerate(grid):
@@ -99,7 +99,7 @@ def display_grid(grid: list[list[Channel]], shade: bool = False):
         print()
 
 
-def random_world(rows: int, cols: int, seed: list[int] = [0, 1], smoothing: int = 2) -> list[list[Channel]]:
+def random_world(rows: int, cols: int, seed: list[int], smoothing: int = 2) -> list[list[Channel]]:
     grid = [[Channel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
     # Repeatedly apply a majority filter to produce smooth blobs
     for _ in range(smoothing):
@@ -127,7 +127,7 @@ def main():
     ROWS = size.lines
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    seed = [0,1,1,1]
+    seed = [0,1]
     if len(sys.argv) > 1:
         seed = [int(x, 16) for x in sys.argv[1]]
     world = random_world(ROWS, COLS, seed=seed)
