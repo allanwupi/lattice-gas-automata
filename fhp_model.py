@@ -20,6 +20,7 @@ PARTICLE_DENSITY = [
 ]
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
+OBSTACLE_RADIUS = 11
 
 
 # REST E NE NW W SW SE
@@ -147,7 +148,13 @@ def transport_step(grid: list[list[FHPChannel]]):
     rows, cols = len(grid), len(grid[0])
     update = [[FHPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
     def within_bounds(cell: tuple[int, int]):
-        return (0 <= cell[0] < rows and 0 <= cell[1] < cols)
+        cx, cy = rows//2, cols//2
+        x, y = cell[0], cell[1]
+        return (
+            0 <= x < rows
+            and 0 <= y < cols
+            and abs(x-cx)**2 + abs(y-cy)**2 >= OBSTACLE_RADIUS**2
+        )
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
             neighbours = neighbourhood(i, j)
@@ -203,10 +210,14 @@ def display_grid(grid: list[list[FHPChannel]]):
 
 def random_world(rows: int, cols: int, seed: list[int]) -> list[list[FHPChannel]]:
     grid = [[FHPChannel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
+    cx, cy = rows//2, cols//2
     # Apply a majority filter to produce smooth blobs
     smoothed = [[FHPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
     for i in range(rows):
         for j in range(cols):
+            if abs(i-cx)**2 + abs(j-cy)**2 <= OBSTACLE_RADIUS**2:
+                smoothed[i][j] = FHPChannel.EMPTY
+                continue
             neighbors = []
             for dr in (-1, 0, 1):
                 for dc in (-1, 0, 1):
