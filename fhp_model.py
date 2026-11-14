@@ -4,7 +4,8 @@ Frisch-Hasslacher-Pomeau (FHP) model
 Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
 from enum import IntFlag, auto
-from random import choice, randint
+from collections import Counter
+from random import choice, random
 import sys, time, shutil
 
 PARTICLE_DENSITY = [
@@ -200,6 +201,27 @@ def display_grid(grid: list[list[FHPChannel]]):
         print()
 
 
+def random_world(rows: int, cols: int, seed: list[int]) -> list[list[FHPChannel]]:
+    grid = [[FHPChannel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
+    # Apply a majority filter to produce smooth blobs
+    smoothed = [[FHPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
+    for i in range(rows):
+        for j in range(cols):
+            neighbors = []
+            for dr in (-1, 0, 1):
+                for dc in (-1, 0, 1):
+                    ii = i + dr
+                    jj = j + dc
+                    if 0 <= ii < rows and 0 <= jj < cols:
+                        neighbors.append(grid[ii][jj])
+            # Add occasional noise to prevent uniform results
+            if random() < 0.1:
+                smoothed[i][j] = FHPChannel(choice(seed))
+            else:
+                smoothed[i][j] = Counter(neighbors).most_common(1)[0][0]
+    return smoothed
+
+
 def main():
     size = shutil.get_terminal_size()
     ROWS = size.lines-1
@@ -215,7 +237,7 @@ def main():
                 seed.extend([0]*len(x))
             else:
                 seed.append(value)
-    world = [[FHPChannel(choice(seed)) for _ in range(COLS)] for _ in range(ROWS)]
+    world = random_world(ROWS, COLS, seed)
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
