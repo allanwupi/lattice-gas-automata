@@ -3,6 +3,11 @@
 Hardy-Pomeau-Pazzis (HPP) model
 Square lattice: 4 velocities
 '''
+from enum import IntFlag, auto
+from collections import Counter
+from random import choice, random
+import sys, time, shutil
+
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 600
@@ -14,7 +19,6 @@ PARTICLE_DENSITY = [
     "██",
 ]
 
-from enum import IntFlag, auto
 
 class Channel(IntFlag):
     EMPTY = 0
@@ -50,37 +54,32 @@ def collision_step(grid: list[list[Channel]]) -> None:
 
 
 def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = True) -> list[list[Channel]]:
-    rows = len(grid)
-    cols = len(grid[0])
+    rows, cols = len(grid), len(grid[0])
     update = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
-    for i, row in enumerate(grid):
-        for j, cell in enumerate(row):
-            # North movement
-            if Channel.N in cell:
+    for i, line in enumerate(grid):
+        for j, cell in enumerate(line):
+            if Channel.N in cell:  # North
                 if (i-1) >= 0:
                     update[i-1][j] |= Channel.N
                 elif wraprows:
                     update[rows-1][j] |= Channel.N
                 else:
                     update[i][j] |= Channel.S
-            # South movement
-            if Channel.S in cell:
-                if (i+1) <= rows-1:
+            if Channel.S in cell:  # South
+                if (i+1) < rows:
                     update[i+1][j] |= Channel.S
                 elif wraprows:
                     update[0][j] |= Channel.S
                 else:
                     update[i][j] |= Channel.N
-            # East movement
-            if Channel.E in cell:
-                if (j+1) <= cols-1:
+            if Channel.E in cell:  # East
+                if (j+1) < cols:
                     update[i][j+1] |= Channel.E
                 elif wrapcols:
                     update[i][0] |= Channel.E
                 else:
                     update[i][j] |= Channel.W
-            # West movement
-            if Channel.W in cell:
+            if Channel.W in cell:  # West
                 if (j-1) >= 0:
                     update[i][j-1] |= Channel.W
                 elif wrapcols:
@@ -100,16 +99,30 @@ def display_grid(grid: list[list[Channel]], shade: bool = False):
         print()
 
 
-def random_world(rows: int, cols: int, seed: list[int] = [0, 1]) -> list[list[Channel]]:
-    from random import choice
-    return [
-        [Channel(choice(seed)) for _ in range(cols)]
-        for _ in range(rows)
-    ]
+def random_world(rows: int, cols: int, seed: list[int] = [0, 1], smoothing: int = 2) -> list[list[Channel]]:
+    grid = [[Channel(choice(seed)) for _ in range(cols)] for _ in range(rows)]
+    # Repeatedly apply a majority filter to produce smooth blobs
+    for _ in range(smoothing):
+        updated = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
+        for i in range(rows):
+            for j in range(cols):
+                neighbors = []
+                for dr in (-1, 0, 1):
+                    for dc in (-1, 0, 1):
+                        ii = i + dr
+                        jj = j + dc
+                        if 0 <= ii < rows and 0 <= jj < cols:
+                            neighbors.append(grid[ii][jj])
+                # Add occasional noise to prevent uniform results
+                if random() < 0.1:
+                    updated[i][j] = Channel(choice(seed))
+                else:
+                    updated[i][j] = Counter(neighbors).most_common(1)[0][0]
+        grid = updated
+    return grid
 
 
 def main():
-    import sys, time, shutil
     size = shutil.get_terminal_size()
     ROWS = size.lines
     COLS = size.columns // 2
