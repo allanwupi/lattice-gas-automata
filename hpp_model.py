@@ -6,7 +6,13 @@ Square lattice: 4 velocities
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 600
-PARTICLE_DENSITY = " ░▒▓█"
+PARTICLE_DENSITY = [
+    "  ",
+    "░░",
+    "▒▒",
+    "▓▓",
+    "██",
+]
 
 from enum import IntFlag, auto
 
@@ -76,7 +82,7 @@ def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: 
 def display_grid(grid: list[list[Channel]]):
     for row in grid:
         for cell in row:
-            print(str(cell)*2, end="")
+            print(str(cell), end="")
         print()
 
 
