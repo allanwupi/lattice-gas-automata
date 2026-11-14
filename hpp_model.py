@@ -11,7 +11,7 @@ import sys, time, shutil
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-BLOCK_GRAPHICS = True
+BLOCK_GRAPHICS = False
 PARTICLE_DENSITY = [
     "  ",
     "░░",
@@ -33,14 +33,14 @@ class Channel(IntFlag):
         if count >= 4: return r"@@"
         if count >= 3: return r"%%"
         if count >= 2:
-            if self == (Channel.E | Channel.W): return "←→"
+            if self == (Channel.E | Channel.W): return "→←"
             if self == (Channel.N | Channel.S): return "↑↓"
             return "++"
         if count >= 1:
             if self == Channel.N: return "↑ "
-            if self == Channel.S: return " ↓"
-            if self == Channel.E: return " →"
-            if self == Channel.W: return "← "
+            if self == Channel.S: return "↓ "
+            if self == Channel.E: return "→ "
+            if self == Channel.W: return " ←"
         return "  "
 
 
