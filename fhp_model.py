@@ -9,7 +9,7 @@ import sys, time, shutil, random
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 20
+OBSTACLE_RADIUS = 12
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
@@ -115,12 +115,13 @@ class FHPChannel(IntFlag):
 
 
 def neighbourhood(x: int, y: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = True) -> dict[FHPChannel, tuple[int, int]]:
-    def wraparound(ii: int, jj: int):
+    def wraparound(x: int, y: int):
+        nx, ny = x, y
         if wraprows:
-            ii = (ii+rows) % rows
+            nx = (x+rows) % rows
         if wrapcols:
-            jj = (jj+cols) % cols
-        return (ii, jj)
+            ny = (y+cols) % cols
+        return (nx, ny)
     neighbours = {
         FHPChannel.W: wraparound(x,y-1),
         FHPChannel.E: wraparound(x,y+1)
@@ -178,39 +179,39 @@ def transport_step(grid: list[list[FHPChannel]]):
         for y, cell in enumerate(line):
             neighbours = neighbourhood(x, y, rows, cols)
             if FHPChannel.E in cell:
-                xx, yy = neighbours[FHPChannel.E]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.E
+                nx, ny = neighbours[FHPChannel.E]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.E
                 else:
                     update[x][y] |= FHPChannel.W
             if FHPChannel.NE in cell:
-                xx, yy = neighbours[FHPChannel.NE]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.NE
+                nx, ny = neighbours[FHPChannel.NE]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.NE
                 else:
                     update[x][y] |= FHPChannel.SW
             if FHPChannel.NW in cell:
-                xx, yy = neighbours[FHPChannel.NW]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.NW
+                nx, ny = neighbours[FHPChannel.NW]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.NW
                 else:
                     update[x][y] |= FHPChannel.SE
             if FHPChannel.W in cell:
-                xx, yy = neighbours[FHPChannel.W]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.W
+                nx, ny = neighbours[FHPChannel.W]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.W
                 else:
                     update[x][y] |= FHPChannel.E
             if FHPChannel.SW in cell:
-                xx, yy = neighbours[FHPChannel.SW]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.SW
+                nx, ny = neighbours[FHPChannel.SW]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.SW
                 else:
                     update[x][y] |= FHPChannel.NE
             if FHPChannel.SE in cell:
-                xx, yy = neighbours[FHPChannel.SE]
-                if within_bounds((xx,yy)):
-                    update[xx][yy] |= FHPChannel.SE
+                nx, ny = neighbours[FHPChannel.SE]
+                if within_bounds((nx,ny)):
+                    update[nx][ny] |= FHPChannel.SE
                 else:
                     update[x][y] |= FHPChannel.NW
             if FHPChannel.REST in cell:
@@ -240,10 +241,10 @@ def random_world(rows: int, cols: int, spawn: list[int]) -> list[list[FHPChannel
             neighbors = []
             for dx in (-1, 0, 1):
                 for dy in (-1, 0, 1):
-                    xx = x + dx
-                    yy = y + dy
-                    if 0 <= xx < rows and 0 <= yy < cols:
-                        neighbors.append(grid[xx][yy])
+                    nx = x + dx
+                    ny = y + dy
+                    if 0 <= nx < rows and 0 <= ny < cols:
+                        neighbors.append(grid[nx][ny])
             # Add occasional noise to prevent uniform results
             if random.random() < 0.1:
                 smoothed[x][y] = FHPChannel(random.choice(spawn))
