@@ -20,7 +20,7 @@ PARTICLE_DENSITY = [
 ]
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 11
+OBSTACLE_RADIUS = 12
 COLOUR_SCHEME = False
 
 
@@ -138,7 +138,7 @@ def neighbourhood(i: int, j: int, rows: int, cols: int, wraprows: bool = False, 
     return neighbours
 
 
-def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "circle"):
+def obstacle(i: int, j: int, rows: int, cols: int, mode: str = "square"):
     cx, cy = rows//2, cols//2
     match mode:
         case "circle":
@@ -171,7 +171,7 @@ def transport_step(grid: list[list[FHPChannel]]):
         return (
             0 <= x < rows
             and 0 <= y < cols
-            and not obstacle(x, y, rows, cols)
+            and not obstacle(x, y, rows, cols, "")
         )
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
@@ -218,14 +218,10 @@ def transport_step(grid: list[list[FHPChannel]]):
 
                    
 def display_grid(grid: list[list[FHPChannel]]):
-    rows, cols = len(grid), len(grid[0])
     for i, row in enumerate(grid):
         if i % 2 == 1:  # Odd row, offset by half
             print(" ", end="")
-        for j, cell in enumerate(row):
-            if obstacle(i, j, rows, cols):
-                print("  ", end="")
-                continue
+        for cell in row:
             print(cell, end="")
         print()
 
