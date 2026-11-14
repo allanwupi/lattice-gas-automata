@@ -7,20 +7,21 @@ from enum import IntFlag, auto
 from collections import Counter
 import sys, time, shutil, random
 
-DELAY_SECONDS = 0.05
+
+DELAY_SECONDS = 0.06
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 15
+OBSTACLE_RADIUS = 12
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
-    ": ",
-    "= ",
     "++",
     "**",
+    "##",
     "%%",
     "@@",
+    "$$",
 ]
 
 
@@ -111,6 +112,12 @@ class FHPChannel(IntFlag):
     REST = auto()
 
     def __str__(self) -> str:
+        if self == FHPChannel.NW: return "↖ "
+        if self == FHPChannel.NE: return " ↗"
+        if self == FHPChannel.SE: return " ↘"
+        if self == FHPChannel.SW: return "↙ "
+        if self == FHPChannel.E: return "→ "
+        if self == FHPChannel.W: return " ←"
         return PARTICLE_DENSITY[len(self)]
 
 
