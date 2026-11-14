@@ -25,7 +25,18 @@ class Channel(IntFlag):
 
     def __str__(self) -> str:
         count = len(self)
-        return PARTICLE_DENSITY[count]
+        if count >= 4: return r"@@"
+        if count >= 3: return r"%%"
+        if count >= 2:
+            if self == (Channel.E | Channel.W): return "←→"
+            if self == (Channel.N | Channel.S): return "↑↓"
+            return "++"
+        if count >= 1:
+            if self == Channel.N: return "↑ "
+            if self == Channel.S: return " ↓"
+            if self == Channel.E: return " →"
+            if self == Channel.W: return "← "
+        return "  "
 
 
 def collision_step(grid: list[list[Channel]]) -> None:
@@ -79,10 +90,13 @@ def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: 
     return update
 
 
-def display_grid(grid: list[list[Channel]]):
+def display_grid(grid: list[list[Channel]], shade: bool = False):
     for row in grid:
         for cell in row:
-            print(str(cell), end="")
+            if shade:
+                print(PARTICLE_DENSITY[len(cell)], end="")
+            else:
+                print(str(cell), end="")
         print()
 
 
@@ -107,7 +121,7 @@ def main():
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
-            display_grid(world)
+            display_grid(world, shade=False)
             collision_step(world)
             world = transport_step(world)
             delay = DELAY_SECONDS - time.perf_counter() + start
