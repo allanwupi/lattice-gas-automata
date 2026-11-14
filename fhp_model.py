@@ -244,8 +244,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    seed = [2**i for i in range(len(FHPChannel)-1)]
-    seed.extend([0 for _ in range(len(FHPChannel))])
+    seed = [0, 4, 4, 4, 4]
     if len(sys.argv) > 1:
         seed = []
         for x in sys.argv[1:]:
