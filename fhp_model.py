@@ -16,9 +16,10 @@ COLOUR_SCHEME = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
+    #": ",
+    "::",
     "++",
     "**",
-    "##",
     "%%",
     "@@",
     "$$",
@@ -112,12 +113,12 @@ class FHPChannel(IntFlag):
     REST = auto()
 
     def __str__(self) -> str:
-        if self == FHPChannel.NW: return "↖ "
-        if self == FHPChannel.NE: return " ↗"
-        if self == FHPChannel.SE: return " ↘"
-        if self == FHPChannel.SW: return "↙ "
-        if self == FHPChannel.E: return "→ "
-        if self == FHPChannel.W: return " ←"
+        #if self == FHPChannel.NW: return "↖ "
+        #if self == FHPChannel.NE: return " ↗"
+        #if self == FHPChannel.SE: return " ↘"
+        #if self == FHPChannel.SW: return "↙ "
+        #if self == FHPChannel.E: return "→ "
+        #if self == FHPChannel.W: return " ←"
         return PARTICLE_DENSITY[len(self)]
 
 
