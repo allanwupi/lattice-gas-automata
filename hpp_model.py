@@ -10,16 +10,9 @@ import sys, time, shutil, random
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-BLOCK_GRAPHICS = True
-COLOUR_SCHEME = True
+COLOUR_SCHEME = "blue"
+GRAPHIC_STYLE = "block"
 SMOOTH_FILTER = True
-PARTICLE_DENSITY = [
-    "  ",
-    "░░",
-    "▒▒",
-    "▓▓",
-    "██",
-]
 
 
 class Channel(IntFlag):
@@ -30,19 +23,21 @@ class Channel(IntFlag):
     W = auto()
 
     def __str__(self) -> str:
-        count = len(self)
-        if count >= 4: return r"@@"
-        if count >= 3: return r"%%"
-        if count >= 2:
-            if self == (Channel.E | Channel.W): return "→←"
-            if self == (Channel.N | Channel.S): return "↑↓"
-            return "++"
-        if count >= 1:
-            if self == Channel.N: return "↑ "
-            if self == Channel.S: return "↓ "
-            if self == Channel.E: return "→ "
-            if self == Channel.W: return " ←"
-        return "  "
+        PARTICLE_DENSITY = {
+            "arrow": ["  ", "..", "++", "%%", "@@"],
+            "block": ["  ", "░░", "▒▒", "▓▓", "██"]
+        }
+        particle_count = len(self)
+        if GRAPHIC_STYLE == "arrow":
+            if particle_count >= 2:
+                if self == (Channel.E | Channel.W): return "→←"
+                if self == (Channel.N | Channel.S): return "↑↓"
+            if particle_count >= 1:
+                if self == Channel.N: return "↑ "
+                if self == Channel.S: return "↓ "
+                if self == Channel.E: return "→ "
+                if self == Channel.W: return " ←"
+        return PARTICLE_DENSITY[GRAPHIC_STYLE][particle_count]
 
 
 def collision_step(grid: list[list[Channel]]) -> None:
@@ -91,13 +86,10 @@ def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: 
     return update
 
 
-def display_grid(grid: list[list[Channel]], shade: bool = False):
+def display_grid(grid: list[list[Channel]]):
     for row in grid:
         for cell in row:
-            if shade:
-                print(PARTICLE_DENSITY[len(cell)], end="")
-            else:
-                print(str(cell), end="")
+            print(str(cell), end="")
         print()
 
 
@@ -141,12 +133,12 @@ def main():
             else:
                 spawn.append(value)
     world = random_world(ROWS, COLS, spawn=spawn)
-    if COLOUR_SCHEME:
+    if COLOUR_SCHEME == "blue":
         print("\x1b[1;94;44m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
-            display_grid(world, shade=BLOCK_GRAPHICS)
+            display_grid(world)
             collision_step(world)
             world = transport_step(world)
             delay = DELAY_SECONDS - time.perf_counter() + start

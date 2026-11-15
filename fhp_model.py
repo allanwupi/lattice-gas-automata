@@ -12,20 +12,83 @@ DELAY_SECONDS = 0.06
 MAX_SIMULATION_TICKS = 1200
 OBSTACLE_RADIUS = 25
 OBSTACLE_SHAPE = "circle"
-COLOUR_SCHEME = False
+GRAPHIC_STYLE = "block"
+COLOUR_SCHEME = "blue"
 SMOOTH_FILTER = False
 DRAW_ARROWS = False
 EMITTER_WALL = True
-PARTICLE_DENSITY = [
-    "  ",
-    ". ",
-    ": ",
-    "+ ",
-    "* ",
-    "% ",
-    "@ ",
-    "$ ",
-]
+
+
+class FHPChannel(IntFlag):
+    EMPTY = 0
+    SE = auto()
+    SW = auto()
+    W = auto()
+    NW = auto()
+    NE = auto()
+    E = auto()
+    REST = auto()
+
+    @classmethod
+    def source(cls) -> FHPChannel:
+        return random.choice([
+            FHPChannel.E,
+            FHPChannel.EMPTY
+        ])
+    
+    def __str__(self) -> str:
+        PARTICLE_DENSITY = {
+            "point": ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
+            "arrow": ["  ", "..", "++", "**", "##", "%%", "@@", "$$"],
+            "block": ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
+        }
+        if DRAW_ARROWS:
+            match self:
+                case FHPChannel.NW: return "↖ "
+                case FHPChannel.NE: return " ↗"
+                case FHPChannel.SE: return " ↘"
+                case FHPChannel.SW: return "↙ "
+                case FHPChannel.E: return "→ "
+                case FHPChannel.W: return " ←"
+        return PARTICLE_DENSITY[GRAPHIC_STYLE][len(self)]
+
+
+def neighbourhood(x: int, y: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = False) -> dict[FHPChannel, tuple[int, int]]:
+    def wraparound(x: int, y: int):
+        nx, ny = x, y
+        if wraprows:
+            nx = (x+rows) % rows
+        if wrapcols:
+            ny = (y+cols) % cols
+        return (nx, ny)
+    neighbours = {
+        FHPChannel.W: wraparound(x,y-1),
+        FHPChannel.E: wraparound(x,y+1)
+    }
+    if x % 2 == 0:  # Even rows
+        neighbours[FHPChannel.NW] = wraparound(x-1,y-1)
+        neighbours[FHPChannel.NE] = wraparound(x-1,y)
+        neighbours[FHPChannel.SW] = wraparound(x+1,y-1)
+        neighbours[FHPChannel.SE] = wraparound(x+1,y)
+    else:  # Odd rows
+        neighbours[FHPChannel.NW] = wraparound(x-1,y)
+        neighbours[FHPChannel.NE] = wraparound(x-1,y+1)
+        neighbours[FHPChannel.SW] = wraparound(x+1,y)
+        neighbours[FHPChannel.SE] = wraparound(x+1,y+1)
+    return neighbours
+
+
+def obstacle(dx: int, dy: int, shape: str = OBSTACLE_SHAPE):
+    match shape:
+        case "circle":  # Euclidian distance
+            return abs(dx)**2 + abs(dy)**2 <= OBSTACLE_RADIUS**2
+        case "square":  # Chebyshev distance
+            return max(abs(dx), abs(dy)) <= OBSTACLE_RADIUS
+        case "diamond":  # Manhattan distance
+            return abs(dx) + abs(dy) <= OBSTACLE_RADIUS
+        case _:
+            return False
+    
 
 # REST E NE NW W SW SE
 COLLISION_RULES = {
@@ -102,72 +165,6 @@ COLLISION_RULES = {
     0b1_100_110: [0b1_001_011, 0b0_010_111],
 }
 
-
-class FHPChannel(IntFlag):
-    EMPTY = 0
-    SE = auto()
-    SW = auto()
-    W = auto()
-    NW = auto()
-    NE = auto()
-    E = auto()
-    REST = auto()
-
-    @classmethod
-    def source(cls) -> FHPChannel:
-        return random.choice([
-            FHPChannel.E,
-            FHPChannel.EMPTY
-        ])
-    
-    def __str__(self) -> str:
-        if DRAW_ARROWS:
-            match self:
-                case FHPChannel.NW: return "↖ "
-                case FHPChannel.NE: return " ↗"
-                case FHPChannel.SE: return " ↘"
-                case FHPChannel.SW: return "↙ "
-                case FHPChannel.E: return "→ "
-                case FHPChannel.W: return " ←"
-        return PARTICLE_DENSITY[len(self)]
-
-
-def neighbourhood(x: int, y: int, rows: int, cols: int, wraprows: bool = False, wrapcols: bool = True) -> dict[FHPChannel, tuple[int, int]]:
-    def wraparound(x: int, y: int):
-        nx, ny = x, y
-        if wraprows:
-            nx = (x+rows) % rows
-        if wrapcols:
-            ny = (y+cols) % cols
-        return (nx, ny)
-    neighbours = {
-        FHPChannel.W: wraparound(x,y-1),
-        FHPChannel.E: wraparound(x,y+1)
-    }
-    if x % 2 == 0:  # Even rows
-        neighbours[FHPChannel.NW] = wraparound(x-1,y-1)
-        neighbours[FHPChannel.NE] = wraparound(x-1,y)
-        neighbours[FHPChannel.SW] = wraparound(x+1,y-1)
-        neighbours[FHPChannel.SE] = wraparound(x+1,y)
-    else:  # Odd rows
-        neighbours[FHPChannel.NW] = wraparound(x-1,y)
-        neighbours[FHPChannel.NE] = wraparound(x-1,y+1)
-        neighbours[FHPChannel.SW] = wraparound(x+1,y)
-        neighbours[FHPChannel.SE] = wraparound(x+1,y+1)
-    return neighbours
-
-
-def obstacle(dx: int, dy: int, shape: str = OBSTACLE_SHAPE):
-    match shape:
-        case "circle":  # Euclidian distance
-            return abs(dx)**2 + abs(dy)**2 <= OBSTACLE_RADIUS**2
-        case "square":  # Chebyshev distance
-            return max(abs(dx), abs(dy)) <= OBSTACLE_RADIUS
-        case "diamond":  # Manhattan distance
-            return abs(dx) + abs(dy) <= OBSTACLE_RADIUS
-        case _:
-            return False
-    
 
 def collision_step(grid: list[list[FHPChannel]]) -> None:
     for x, row in enumerate(grid):
@@ -294,7 +291,7 @@ def main():
             else:
                 spawn.append(value)
     world = random_world(ROWS, COLS, spawn)
-    if COLOUR_SCHEME:
+    if COLOUR_SCHEME == "blue":
         print("\x1b[1;44m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
