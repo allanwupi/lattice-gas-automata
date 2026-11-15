@@ -8,17 +8,17 @@ from collections import Counter
 import sys, time, shutil, random
 
 
-DELAY_SECONDS = 0.06
+DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 12
+OBSTACLE_RADIUS = 10
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
 DRAW_ARROWS = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
-    "::",
-    "++",
+    ": ",
+    "+ ",
     "**",
     "%%",
     "@@",
@@ -267,7 +267,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    spawn = [0, 4, 4, 4, 4]
+    spawn = [0, 0, 4, 4, 4]
     if len(sys.argv) > 1:
         spawn = []
         for x in sys.argv[1:]:
