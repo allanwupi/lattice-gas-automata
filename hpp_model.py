@@ -10,8 +10,9 @@ import sys, time, shutil, random
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-BLOCK_GRAPHICS = False
-COLOUR_SCHEME = False
+BLOCK_GRAPHICS = True
+COLOUR_SCHEME = True
+SMOOTH_FILTER = True
 PARTICLE_DENSITY = [
     "  ",
     "░░",
@@ -102,6 +103,8 @@ def display_grid(grid: list[list[Channel]], shade: bool = False):
 
 def random_world(rows: int, cols: int, spawn: list[int], smoothing: int = 2) -> list[list[Channel]]:
     grid = [[Channel(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
+    if not SMOOTH_FILTER:
+        return grid
     # Repeatedly apply a majority filter to produce smooth blobs
     for _ in range(smoothing):
         updated = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
@@ -128,7 +131,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    spawn = [0,1,1,1]
+    spawn = [0,8,8,8]
     if len(sys.argv) > 1:
         spawn = [int(x, 16) for x in sys.argv[1]]
     world = random_world(ROWS, COLS, spawn=spawn)
