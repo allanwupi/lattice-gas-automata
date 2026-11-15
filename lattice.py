@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from collections import Counter
 from enum import IntFlag
 from typing import ClassVar
-import random
+from graphics import ColourScheme
+import random, time
 
 
 def obstacle(dx: int, dy: int, shape: str, radius: int):
@@ -35,10 +36,9 @@ class Lattice(ABC):
         self.neighbourhood = [[dict() for _ in range(cols)] for _ in range(rows)]
         self.wraprows = wraprows
         self.wrapcols = wrapcols
-        def wraparound(x: int, y: int):
-            return ((x+rows) % rows if self.wraprows else x, (y+cols) % cols if self.wrapcols else y)
         for x in range(rows):
             for y in range(cols):
+                self.build_neighbourhood(x, y, wraprows, wrapcols)
                 if obstacle(x-cx, y-cy, shape, radius):
                     if void:
                         continue
@@ -68,6 +68,12 @@ class Lattice(ABC):
     @abstractmethod
     def opposite(self, direction: IntFlag) -> IntFlag:
         raise NotImplementedError
+
+    @abstractmethod
+    def row_prefix(self, row: int) -> str:
+        #if x % 2 == 1:  # Odd row, offset by half
+        #    chars.append(" ")
+        return ""
     
     def collision_step(self) -> None:
         for x, row in enumerate(self.particles):
@@ -107,12 +113,6 @@ class Lattice(ABC):
                             update[x][y] |= self.opposite(direction)
         self.particles = update
 
-    @abstractmethod
-    def row_prefix(self, row: int) -> str:
-        #if x % 2 == 1:  # Odd row, offset by half
-        #    chars.append(" ")
-        return ""
-
     def __str__(self) -> str:
         chars = []
         for x, row in enumerate(self.particles):
@@ -124,3 +124,23 @@ class Lattice(ABC):
                     chars.append(str(cell))
             chars.append("\n")
         return "".join(chars)
+
+
+def simulate(rows: int, cols: int, world: Lattice, frame_rate: float, simulation_ticks: int, colour: ColourScheme):
+    CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
+    CLEAR_SCREEN = CLEAR_LINE * rows
+    DELAY_SECONDS = round(1.0 / frame_rate, 6)
+    print(colour, end="")
+    try:
+        for _ in range(simulation_ticks):
+            start = time.perf_counter()
+            print(world, end="")
+            world.collision_step()
+            world.transport_step()
+            delay = DELAY_SECONDS - time.perf_counter() + start
+            if delay > 0:
+                time.sleep(delay)
+            print(CLEAR_SCREEN, end="")
+    except KeyboardInterrupt:
+        pass
+    print(f"{ColourScheme.RESET}{CLEAR_SCREEN}", end="")
