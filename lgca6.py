@@ -9,13 +9,13 @@ import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.06666666667
+DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 6000
 OBSTACLE_RADIUS = 20
-OBSTACLE_SHAPE = "square"
+OBSTACLE_SHAPE = "circle"
 EMITTER_WALL = True
 SMOOTH_FILTER = False
-SOURCE_CHANNEL = [0, 32]
+SOURCE_CHANNEL = [0, 32, 32]
 
 class ColourScheme(StrEnum):
     BLACK = "\033[37;40m;"
