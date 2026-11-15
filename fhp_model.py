@@ -10,19 +10,20 @@ import sys, time, shutil, random
 
 DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 10
+OBSTACLE_RADIUS = 12
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
 DRAW_ARROWS = False
+EMITTER_WALL = False
 PARTICLE_DENSITY = [
     "  ",
     ". ",
     ": ",
     "+ ",
-    "**",
-    "%%",
-    "@@",
-    "$$",
+    "* ",
+    "% ",
+    "@ ",
+    "$ ",
 ]
 
 # REST E NE NW W SW SE
@@ -186,6 +187,11 @@ def transport_step(grid: list[list[FHPChannel]]):
         )
     for x, line in enumerate(grid):
         for y, cell in enumerate(line):
+            if EMITTER_WALL:
+                if y == cols-1:
+                    update[x][cols-1] |= FHPChannel.W
+                elif y == 0:
+                    continue
             neighbours = neighbourhood(x, y, rows, cols)
             if FHPChannel.E in cell:
                 nx, ny = neighbours[FHPChannel.E]
