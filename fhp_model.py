@@ -15,7 +15,6 @@ OBSTACLE_SHAPE = "circle"
 GRAPHIC_STYLE = "block"
 COLOUR_SCHEME = "blue"
 SMOOTH_FILTER = False
-DRAW_ARROWS = False
 EMITTER_WALL = True
 
 
@@ -33,16 +32,17 @@ class FHPChannel(IntFlag):
     def source(cls) -> FHPChannel:
         return random.choice([
             FHPChannel.E,
+            FHPChannel.E,
             FHPChannel.EMPTY
         ])
     
     def __str__(self) -> str:
         PARTICLE_DENSITY = {
-            "point": ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
-            "arrow": ["  ", "..", "++", "**", "##", "%%", "@@", "$$"],
+            "dot": ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
+            "arrow": ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
             "block": ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
         }
-        if DRAW_ARROWS:
+        if GRAPHIC_STYLE == "arrow":
             match self:
                 case FHPChannel.NW: return "↖ "
                 case FHPChannel.NE: return " ↗"
@@ -281,7 +281,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    spawn = [0,32]
+    spawn = [0,32,32]
     if len(sys.argv) > 1:
         spawn = []
         for x in sys.argv[1:]:

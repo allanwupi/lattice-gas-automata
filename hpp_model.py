@@ -15,7 +15,7 @@ GRAPHIC_STYLE = "block"
 SMOOTH_FILTER = True
 
 
-class Channel(IntFlag):
+class HPPChannel(IntFlag):
     EMPTY = 0
     N = auto()
     S = auto()
@@ -30,76 +30,76 @@ class Channel(IntFlag):
         particle_count = len(self)
         if GRAPHIC_STYLE == "arrow":
             if particle_count >= 2:
-                if self == (Channel.E | Channel.W): return "→←"
-                if self == (Channel.N | Channel.S): return "↑↓"
+                if self == (HPPChannel.E | HPPChannel.W): return "→←"
+                if self == (HPPChannel.N | HPPChannel.S): return "↑↓"
             if particle_count >= 1:
-                if self == Channel.N: return "↑ "
-                if self == Channel.S: return "↓ "
-                if self == Channel.E: return "→ "
-                if self == Channel.W: return " ←"
+                if self == HPPChannel.N: return "↑ "
+                if self == HPPChannel.S: return "↓ "
+                if self == HPPChannel.E: return "→ "
+                if self == HPPChannel.W: return " ←"
         return PARTICLE_DENSITY[GRAPHIC_STYLE][particle_count]
 
 
-def collision_step(grid: list[list[Channel]]) -> None:
+def collision_step(grid: list[list[HPPChannel]]) -> None:
     # Head-on collision between two particles
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
-            if cell == (Channel.N | Channel.S):
-                grid[i][j] = (Channel.E | Channel.W)
-            if cell == (Channel.E | Channel.W):
-                grid[i][j] = (Channel.N | Channel.S)
+            if cell == (HPPChannel.N | HPPChannel.S):
+                grid[i][j] = (HPPChannel.E | HPPChannel.W)
+            if cell == (HPPChannel.E | HPPChannel.W):
+                grid[i][j] = (HPPChannel.N | HPPChannel.S)
 
 
-def transport_step(grid: list[list[Channel]], wraprows: bool = False, wrapcols: bool = False) -> list[list[Channel]]:
+def transport_step(grid: list[list[HPPChannel]], wraprows: bool = False, wrapcols: bool = False) -> list[list[HPPChannel]]:
     rows, cols = len(grid), len(grid[0])
-    update = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
+    update = [[HPPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
     for i, line in enumerate(grid):
         for j, cell in enumerate(line):
-            if Channel.N in cell:  # North
+            if HPPChannel.N in cell:  # North
                 if (i-1) >= 0:
-                    update[i-1][j] |= Channel.N
+                    update[i-1][j] |= HPPChannel.N
                 elif wraprows:
-                    update[rows-1][j] |= Channel.N
+                    update[rows-1][j] |= HPPChannel.N
                 else:
-                    update[i][j] |= Channel.S
-            if Channel.S in cell:  # South
+                    update[i][j] |= HPPChannel.S
+            if HPPChannel.S in cell:  # South
                 if (i+1) < rows:
-                    update[i+1][j] |= Channel.S
+                    update[i+1][j] |= HPPChannel.S
                 elif wraprows:
-                    update[0][j] |= Channel.S
+                    update[0][j] |= HPPChannel.S
                 else:
-                    update[i][j] |= Channel.N
-            if Channel.E in cell:  # East
+                    update[i][j] |= HPPChannel.N
+            if HPPChannel.E in cell:  # East
                 if (j+1) < cols:
-                    update[i][j+1] |= Channel.E
+                    update[i][j+1] |= HPPChannel.E
                 elif wrapcols:
-                    update[i][0] |= Channel.E
+                    update[i][0] |= HPPChannel.E
                 else:
-                    update[i][j] |= Channel.W
-            if Channel.W in cell:  # West
+                    update[i][j] |= HPPChannel.W
+            if HPPChannel.W in cell:  # West
                 if (j-1) >= 0:
-                    update[i][j-1] |= Channel.W
+                    update[i][j-1] |= HPPChannel.W
                 elif wrapcols:
-                    update[i][cols-1] |= Channel.W
+                    update[i][cols-1] |= HPPChannel.W
                 else:
-                    update[i][j] |= Channel.E
+                    update[i][j] |= HPPChannel.E
     return update
 
 
-def display_grid(grid: list[list[Channel]]):
+def display_grid(grid: list[list[HPPChannel]]):
     for row in grid:
         for cell in row:
             print(str(cell), end="")
         print()
 
 
-def random_world(rows: int, cols: int, spawn: list[int], smoothing: int = 2) -> list[list[Channel]]:
-    grid = [[Channel(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
+def random_world(rows: int, cols: int, spawn: list[int], smoothing: int = 2) -> list[list[HPPChannel]]:
+    grid = [[HPPChannel(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
     if not SMOOTH_FILTER:
         return grid
     # Repeatedly apply a majority filter to produce smooth blobs
     for _ in range(smoothing):
-        updated = [[Channel.EMPTY for _ in range(cols)] for _ in range(rows)]
+        updated = [[HPPChannel.EMPTY for _ in range(cols)] for _ in range(rows)]
         for i in range(rows):
             for j in range(cols):
                 neighbors = []
@@ -111,7 +111,7 @@ def random_world(rows: int, cols: int, spawn: list[int], smoothing: int = 2) -> 
                             neighbors.append(grid[ii][jj])
                 # Add occasional noise to prevent uniform results
                 if random.random() < 0.1:
-                    updated[i][j] = Channel(random.choice(spawn))
+                    updated[i][j] = HPPChannel(random.choice(spawn))
                 else:
                     updated[i][j] = Counter(neighbors).most_common(1)[0][0]
         grid = updated
