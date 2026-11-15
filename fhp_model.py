@@ -8,13 +8,14 @@ from collections import Counter
 import sys, time, shutil, random
 
 
-DELAY_SECONDS = 0.05
+DELAY_SECONDS = 0.06
 MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 12
+OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
 COLOUR_SCHEME = False
+SMOOTH_FILTER = False
 DRAW_ARROWS = False
-EMITTER_WALL = False
+EMITTER_WALL = True
 PARTICLE_DENSITY = [
     "  ",
     ". ",
@@ -112,6 +113,13 @@ class FHPChannel(IntFlag):
     E = auto()
     REST = auto()
 
+    @classmethod
+    def source(cls) -> FHPChannel:
+        return random.choice([
+            FHPChannel.E,
+            FHPChannel.EMPTY
+        ])
+    
     def __str__(self) -> str:
         if DRAW_ARROWS:
             match self:
@@ -188,9 +196,9 @@ def transport_step(grid: list[list[FHPChannel]]):
     for x, line in enumerate(grid):
         for y, cell in enumerate(line):
             if EMITTER_WALL:
-                if y == cols-1:
-                    update[x][cols-1] |= FHPChannel.W
-                elif y == 0:
+                if y == 0:
+                    update[x][0] |= FHPChannel.source()
+                elif y == cols-1:
                     continue
             neighbours = neighbourhood(x, y, rows, cols)
             if FHPChannel.E in cell:
@@ -253,6 +261,9 @@ def random_world(rows: int, cols: int, spawn: list[int]) -> list[list[FHPChannel
             if obstacle(x-cx, y-cy):
                 smoothed[x][y] = FHPChannel.EMPTY
                 continue
+            if not SMOOTH_FILTER:
+                smoothed[x][y] = grid[x][y]
+                continue
             neighbors = []
             for dx in (-1, 0, 1):
                 for dy in (-1, 0, 1):
@@ -273,7 +284,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    spawn = [0, 0, 4, 4, 4]
+    spawn = [0,32]
     if len(sys.argv) > 1:
         spawn = []
         for x in sys.argv[1:]:
