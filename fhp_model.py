@@ -9,8 +9,8 @@ import sys, time, shutil, random
 
 
 DELAY_SECONDS = 0.06
-MAX_SIMULATION_TICKS = 1200
-OBSTACLE_RADIUS = 25
+MAX_SIMULATION_TICKS = 2400
+OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
 GRAPHIC_STYLE = "block"
 COLOUR_SCHEME = "blue"
@@ -31,7 +31,6 @@ class FHPChannel(IntFlag):
     @classmethod
     def source(cls) -> FHPChannel:
         return random.choice([
-            FHPChannel.E,
             FHPChannel.E,
             FHPChannel.EMPTY
         ])
@@ -291,8 +290,13 @@ def main():
             else:
                 spawn.append(value)
     world = random_world(ROWS, COLS, spawn)
-    if COLOUR_SCHEME == "blue":
-        print("\x1b[1;44m")
+    match COLOUR_SCHEME:
+        case "blue":
+            print("\x1b[1;44m")
+        case "red":
+            print("\x1b[1;30;41m")
+        case "white":
+            print("\x1b[1;47m")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
