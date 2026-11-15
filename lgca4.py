@@ -3,7 +3,7 @@
 Hardy-Pomeau-Pazzis (HPP) model
 Square lattice: 4 velocities
 '''
-from enum import Enum, IntFlag, auto
+from enum import StrEnum, IntFlag, auto
 from collections import Counter
 import sys, time, shutil, random
 
@@ -13,20 +13,21 @@ DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 SMOOTH_FILTER = True
 
-class GraphicStyle(Enum):
+class ColourScheme(StrEnum):
+    BLACK = "\033[37;40m;"
+    BLUE = "\x1b[1;44m"
+    DEEPBLUE = "\x1b[1;94;44m"
+    RED = "\x1b[1;30;41m"
+    WHITE = "\x1b[1;47m"
+    RESET = "\x1b[0m"
+
+class GraphicStyle(StrEnum):
     ARROW = auto()
     BLOCK = auto()
 
-class ColourScheme(Enum):
-    BLACK = auto()
-    BLUE = auto()
-    DEEPBLUE = auto()
-    RED = auto()
-    WHITE = auto()
-
 # Customise appearance
-GRAPHIC_STYLE = GraphicStyle.BLOCK
 COLOUR_SCHEME = ColourScheme.BLUE
+GRAPHIC_STYLE = GraphicStyle.BLOCK
 
 
 class Particle(IntFlag):
@@ -148,15 +149,7 @@ def main():
             else:
                 spawn.append(value)
     world = Lattice(ROWS, COLS, spawn=spawn)
-    match COLOUR_SCHEME:
-        case ColourScheme.BLUE:
-            print("\x1b[1;44m", end="")
-        case ColourScheme.DEEPBLUE:
-            print("\x1b[1;94;44m", end="")
-        case ColourScheme.RED:
-            print("\x1b[1;30;41m", end="")
-        case ColourScheme.WHITE:
-            print("\x1b[1;47m", end="")
+    print(COLOUR_SCHEME, end="")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
@@ -169,7 +162,7 @@ def main():
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
         pass
-    print(f"\x1b[0m{CLEAR_LINE * ROWS}", end="")
+    print(f"{ColourScheme.RESET}{CLEAR_LINE * ROWS}", end="")
 
 
 if __name__ == "__main__":

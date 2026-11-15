@@ -3,34 +3,36 @@
 Frisch-Hasslacher-Pomeau (FHP) model
 Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
-from enum import Enum, IntFlag, auto
+from enum import StrEnum, IntFlag, auto
 from collections import Counter
 import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.05
-MAX_SIMULATION_TICKS = 2400
+DELAY_SECONDS = 0.06666666667
+MAX_SIMULATION_TICKS = 6000
 OBSTACLE_RADIUS = 20
-OBSTACLE_SHAPE = "circle"
+OBSTACLE_SHAPE = "square"
 EMITTER_WALL = True
 SMOOTH_FILTER = False
+SOURCE_CHANNEL = [0, 32]
 
-class GraphicStyle(Enum):
+class ColourScheme(StrEnum):
+    BLACK = "\033[37;40m;"
+    BLUE = "\x1b[1;44m"
+    DEEPBLUE = "\x1b[1;94;44m"
+    RED = "\x1b[1;30;41m"
+    WHITE = "\x1b[1;47m"
+    RESET = "\x1b[0m"
+
+class GraphicStyle(StrEnum):
     DOT = auto()
     ARROW = auto()
     BLOCK = auto()
 
-class ColourScheme(Enum):
-    BLACK = auto()
-    BLUE = auto()
-    DEEPBLUE = auto()
-    RED = auto()
-    WHITE = auto()
-
 # Customise appearance
+COLOUR_SCHEME = ColourScheme.RED
 GRAPHIC_STYLE = GraphicStyle.BLOCK
-COLOUR_SCHEME = ColourScheme.BLUE
 
 
 PARTICLE_DENSITY = {
@@ -42,17 +44,17 @@ PARTICLE_DENSITY = {
 
 class Particle(IntFlag):
     EMPTY = 0
-    SE = auto()
-    SW = auto()
-    W = auto()
-    NW = auto()
-    NE = auto()
-    E = auto()
-    REST = auto()
+    SE = auto()     # 1
+    SW = auto()     # 2
+    W = auto()      # 4
+    NW = auto()     # 8
+    NE = auto()     # 16
+    E = auto()      # 32
+    REST = auto()   # 64
 
     @classmethod
     def source(cls) -> Particle:
-        return random.choice([Particle.E, Particle.EMPTY])
+        return Particle(random.choice(SOURCE_CHANNEL))
     
     def __str__(self) -> str:
         if GRAPHIC_STYLE == GraphicStyle.ARROW:
@@ -300,15 +302,7 @@ def main():
             else:
                 spawn.append(value)
     world = Lattice(ROWS, COLS, spawn)
-    match COLOUR_SCHEME:
-        case ColourScheme.BLUE:
-            print("\x1b[1;44m", end="")
-        case ColourScheme.DEEPBLUE:
-            print("\x1b[1;94;44m", end="")
-        case ColourScheme.RED:
-            print("\x1b[1;30;41m", end="")
-        case ColourScheme.WHITE:
-            print("\x1b[1;47m", end="")
+    print(COLOUR_SCHEME, end="")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
@@ -321,7 +315,7 @@ def main():
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
         pass
-    print(f"\x1b[0m{CLEAR_LINE * ROWS}", end="")
+    print(f"{ColourScheme.RESET}{CLEAR_LINE * ROWS}", end="")
 
 
 if __name__ == "__main__":
