@@ -31,7 +31,7 @@ class GraphicStyle(StrEnum):
     BLOCK = auto()
 
 # Customise appearance
-COLOUR_SCHEME = ColourScheme.RED
+COLOUR_SCHEME = ColourScheme.BLUE
 GRAPHIC_STYLE = GraphicStyle.BLOCK
 
 
@@ -51,10 +51,6 @@ class Particle(IntFlag):
     NE = auto()     # 16
     E = auto()      # 32
     REST = auto()   # 64
-
-    @classmethod
-    def source(cls) -> Particle:
-        return Particle(random.choice(SOURCE_CHANNEL))
     
     def __str__(self) -> str:
         if GRAPHIC_STYLE == GraphicStyle.ARROW:
@@ -144,12 +140,15 @@ class Lattice:
         0b1_100_110: [0b1_001_011, 0b0_010_111],
     }
 
-    def __init__(self, rows: int, cols: int, spawn: list[int], wraprows: bool = False, wrapcols: bool = False):
+    def __init__(self, rows: int, cols: int, spawn: list[int], source: list[int], wraprows: bool = False, wrapcols: bool = False):
         if not spawn:
             spawn = [0]
+        if not source:
+            source = SOURCE_CHANNEL
         grid = [[Particle(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
-        self.rows, self.cols = rows, cols
         cx, cy = rows//2, cols//2
+        self.rows, self.cols = rows, cols
+        self.source_channel = source
         self.particles = [[Particle.EMPTY for _ in range(cols)] for _ in range(rows)]
         self.walls = [[False for _ in range(cols)] for _ in range(rows)]
         self.neighbourhood = [[dict() for _ in range(cols)] for _ in range(rows)]
@@ -212,9 +211,9 @@ class Lattice:
             return 0 <= nx < self.rows and 0 <= ny < self.cols and not self.walls[nx][ny]
         for x, line in enumerate(self.particles):
             for y, cell in enumerate(line):
-                if EMITTER_WALL:
+                if self.source_channel:
                     if y == 0:
-                        update[x][0] |= Particle.source()
+                        update[x][0] |= Particle(random.choice(self.source_channel))
                     elif y == self.cols-1:
                         continue
                 if self.walls[x][y]:
@@ -301,7 +300,7 @@ def main():
                 spawn.extend([0]*len(x))
             else:
                 spawn.append(value)
-    world = Lattice(ROWS, COLS, spawn)
+    world = Lattice(ROWS, COLS, spawn, source=SOURCE_CHANNEL)
     print(COLOUR_SCHEME, end="")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
