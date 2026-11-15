@@ -8,7 +8,7 @@ Python simulation of lattice gas cellular automata
 
 ## HPP Model
 ```bash
-python hpp_model.py [seed]
+python lgca4.py [spawn]
 ```
 
 Simulation runs at target 20 frames per second.
@@ -29,8 +29,12 @@ class Channel(IntFlag):
     W = auto()
 ```
 
-## FHP Model
-Uses a hexagonal lattice.
+## FHP-III Model
+```bash
+python lgca6.py [spawn]
+```
+
+This simulation comes with an obstacle in the centre (default shape is circle).
 
 Optionally specify a list of digits for initial particle velocities.
 - 0 = EMPTY (none)
