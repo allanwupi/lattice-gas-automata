@@ -9,7 +9,7 @@ import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.06
+DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 2400
 OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
@@ -52,13 +52,10 @@ class Particle(IntFlag):
 
     @classmethod
     def source(cls) -> Particle:
-        return random.choice([
-            Particle.E,
-            Particle.EMPTY
-        ])
+        return random.choice([Particle.E, Particle.EMPTY])
     
     def __str__(self) -> str:
-        if GRAPHIC_STYLE == "arrow":
+        if GRAPHIC_STYLE == GraphicStyle.ARROW:
             match self:
                 case Particle.NW: return "↖ "
                 case Particle.NE: return " ↗"
@@ -146,6 +143,8 @@ class Lattice:
     }
 
     def __init__(self, rows: int, cols: int, spawn: list[int], wraprows: bool = False, wrapcols: bool = False):
+        if not spawn:
+            spawn = [0]
         grid = [[Particle(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
         self.rows, self.cols = rows, cols
         cx, cy = rows//2, cols//2
@@ -292,9 +291,8 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
-    spawn = [0,32,32]
+    spawn = []
     if len(sys.argv) > 1:
-        spawn = []
         for x in sys.argv[1:]:
             value = int(x)
             if value == 0:

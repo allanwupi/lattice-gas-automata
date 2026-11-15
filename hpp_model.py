@@ -42,7 +42,7 @@ class Particle(IntFlag):
             GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▓▓", "██"]
         }
         particle_count = len(self)
-        if GRAPHIC_STYLE == "arrow":
+        if GRAPHIC_STYLE == GraphicStyle.ARROW:
             if particle_count >= 2:
                 if self == (Particle.E | Particle.W): return "→←"
                 if self == (Particle.N | Particle.S): return "↑↓"
