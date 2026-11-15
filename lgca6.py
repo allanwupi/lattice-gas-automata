@@ -3,29 +3,29 @@
 Frisch-Hasslacher-Pomeau (FHP) model
 Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
-from enum import StrEnum, IntFlag, auto
+from enum import IntFlag, auto
 from collections import Counter
 from graphics import ColourScheme, GraphicStyle
 import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.07
+DELAY_SECONDS = 0.067
 MAX_SIMULATION_TICKS = 6000
-OBSTACLE_RADIUS = 40
+OBSTACLE_RADIUS = 30
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = False
 SMOOTH_FILTER = True
-SOURCE_CHANNEL = [0, 32, 49]
+SOURCE_CHANNEL = [0, 32]
 
 # Customise appearance
-COLOUR_SCHEME = ColourScheme.PURPLE
+COLOUR_SCHEME = ColourScheme.BLUE
 GRAPHIC_STYLE = GraphicStyle.BLOCK6
 
 
 PARTICLE_DENSITY = {
-    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
-    GraphicStyle.ARROW6: ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
+    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "@@"],
+    GraphicStyle.ARROW6: ["  ", ". ", "= ", "++", "**", "##", "%%", "@@"],
     GraphicStyle.BLOCK6: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
 }
 
@@ -39,7 +39,17 @@ class Particle(IntFlag):
     NE = auto()     # 16
     E = auto()      # 32
     REST = auto()   # 64
-    
+
+    def opposite(self) -> Particle:
+        match self:
+            case Particle.SE: return Particle.NW
+            case Particle.SW: return Particle.NE
+            case Particle.W: return Particle.E
+            case Particle.NW: return Particle.SE
+            case Particle.NE: return Particle.SW
+            case Particle.E: return Particle.W
+        return Particle.EMPTY 
+
     def __str__(self) -> str:
         if GRAPHIC_STYLE == GraphicStyle.ARROW6:
             match self:
@@ -147,6 +157,7 @@ class Lattice:
         for x in range(rows):
             for y in range(cols):
                 neighbours = {
+                    Particle.REST: (x,y),
                     Particle.W: wraparound(x,y-1),
                     Particle.E: wraparound(x,y+1)
                 }
@@ -211,44 +222,13 @@ class Lattice:
                 if not cell:
                     continue
                 neighbours = self.neighbourhood[x][y]
-                if Particle.E in cell:
-                    nx, ny = neighbours[Particle.E]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.E
-                    else:
-                        update[x][y] |= Particle.W
-                if Particle.NE in cell:
-                    nx, ny = neighbours[Particle.NE]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.NE
-                    else:
-                        update[x][y] |= Particle.SW
-                if Particle.NW in cell:
-                    nx, ny = neighbours[Particle.NW]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.NW
-                    else:
-                        update[x][y] |= Particle.SE
-                if Particle.W in cell:
-                    nx, ny = neighbours[Particle.W]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.W
-                    else:
-                        update[x][y] |= Particle.E
-                if Particle.SW in cell:
-                    nx, ny = neighbours[Particle.SW]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.SW
-                    else:
-                        update[x][y] |= Particle.NE
-                if Particle.SE in cell:
-                    nx, ny = neighbours[Particle.SE]
-                    if within_bounds(nx, ny):
-                        update[nx][ny] |= Particle.SE
-                    else:
-                        update[x][y] |= Particle.NW
-                if Particle.REST in cell:
-                    update[x][y] |= Particle.REST
+                for direction in Particle:
+                    if direction in cell:
+                        nx, ny = neighbours[direction]
+                        if within_bounds(nx, ny):  # Free: move 1 lattice unit in that direction
+                            update[nx][ny] |= direction
+                        else:  # Reflect off boundary/wall
+                            update[x][y] |= direction.opposite()
         self.particles = update
 
     def __str__(self) -> str:
