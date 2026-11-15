@@ -9,20 +9,21 @@ import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.05
+DELAY_SECONDS = 0.07
 MAX_SIMULATION_TICKS = 6000
 OBSTACLE_RADIUS = 40
 OBSTACLE_SHAPE = "circle"
-VOID_OBSTACLE = True
-SMOOTH_FILTER = False
-SOURCE_CHANNEL = [0, 1, 16, 32]
+VOID_OBSTACLE = False
+SMOOTH_FILTER = True
+SOURCE_CHANNEL = [0, 32, 32]
 
 class ColourScheme(StrEnum):
-    BLACK = "\033[37;40m;"
-    BLUE = "\x1b[1;44m"
-    DEEPBLUE = "\x1b[1;94;44m"
-    RED = "\x1b[1;30;41m"
-    WHITE = "\x1b[1;47m"
+    BLACK = "\033[40;37m"
+    PURPLE = "\033[35;37m"
+    BLUE = "\x1b[1;44;97m"
+    DEEPBLUE = "\x1b[1;44;94m"
+    RED = "\x1b[1;41;30m"
+    WHITE = "\x1b[1;107;30m"
     RESET = "\x1b[0m"
 
 class GraphicStyle(StrEnum):

@@ -14,11 +14,12 @@ MAX_SIMULATION_TICKS = 1200
 SMOOTH_FILTER = True
 
 class ColourScheme(StrEnum):
-    BLACK = "\033[37;40m;"
-    BLUE = "\x1b[1;44m"
-    DEEPBLUE = "\x1b[1;94;44m"
-    RED = "\x1b[1;30;41m"
-    WHITE = "\x1b[1;47m"
+    BLACK = "\033[40;37m"
+    PURPLE = "\033[35;37m"
+    BLUE = "\x1b[1;44;97m"
+    DEEPBLUE = "\x1b[1;44;94m"
+    RED = "\x1b[1;41;30m"
+    WHITE = "\x1b[1;107;30m"
     RESET = "\x1b[0m"
 
 class GraphicStyle(StrEnum):
