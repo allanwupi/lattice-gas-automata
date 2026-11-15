@@ -5,6 +5,7 @@ Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
 from enum import StrEnum, IntFlag, auto
 from collections import Counter
+from graphics import ColourScheme, GraphicStyle
 import sys, time, shutil, random
 
 
@@ -15,31 +16,17 @@ OBSTACLE_RADIUS = 40
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = False
 SMOOTH_FILTER = True
-SOURCE_CHANNEL = [0, 32, 32]
-
-class ColourScheme(StrEnum):
-    BLACK = "\033[40;37m"
-    PURPLE = "\033[35;37m"
-    BLUE = "\x1b[1;44;97m"
-    DEEPBLUE = "\x1b[1;44;94m"
-    RED = "\x1b[1;41;30m"
-    WHITE = "\x1b[1;107;30m"
-    RESET = "\x1b[0m"
-
-class GraphicStyle(StrEnum):
-    DOT = auto()
-    ARROW = auto()
-    BLOCK = auto()
+SOURCE_CHANNEL = [0, 32, 49]
 
 # Customise appearance
-COLOUR_SCHEME = ColourScheme.BLUE
-GRAPHIC_STYLE = GraphicStyle.BLOCK
+COLOUR_SCHEME = ColourScheme.PURPLE
+GRAPHIC_STYLE = GraphicStyle.BLOCK6
 
 
 PARTICLE_DENSITY = {
-    GraphicStyle.DOT: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
-    GraphicStyle.ARROW: ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
-    GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
+    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
+    GraphicStyle.ARROW6: ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
+    GraphicStyle.BLOCK6: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
 }
 
 
@@ -54,7 +41,7 @@ class Particle(IntFlag):
     REST = auto()   # 64
     
     def __str__(self) -> str:
-        if GRAPHIC_STYLE == GraphicStyle.ARROW:
+        if GRAPHIC_STYLE == GraphicStyle.ARROW6:
             match self:
                 case Particle.NW: return "↖ "
                 case Particle.NE: return " ↗"

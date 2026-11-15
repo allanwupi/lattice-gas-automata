@@ -5,6 +5,7 @@ Square lattice: 4 velocities
 '''
 from enum import StrEnum, IntFlag, auto
 from collections import Counter
+from graphics import ColourScheme, GraphicStyle
 import sys, time, shutil, random
 
 
@@ -13,27 +14,14 @@ DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 1200
 SMOOTH_FILTER = True
 
-class ColourScheme(StrEnum):
-    BLACK = "\033[40;37m"
-    PURPLE = "\033[35;37m"
-    BLUE = "\x1b[1;44;97m"
-    DEEPBLUE = "\x1b[1;44;94m"
-    RED = "\x1b[1;41;30m"
-    WHITE = "\x1b[1;107;30m"
-    RESET = "\x1b[0m"
-
-class GraphicStyle(StrEnum):
-    ARROW = auto()
-    BLOCK = auto()
-
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
-GRAPHIC_STYLE = GraphicStyle.BLOCK
+GRAPHIC_STYLE = GraphicStyle.BLOCK4
 
 
 PARTICLE_DENSITY = {
-    GraphicStyle.ARROW: ["  ", "..", "++", "%%", "@@"],
-    GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▓▓", "██"]
+    GraphicStyle.ARROW4: ["  ", "..", "++", "%%", "@@"],
+    GraphicStyle.BLOCK4: ["  ", "░░", "▒▒", "▓▓", "██"]
 }
 
 
@@ -46,7 +34,7 @@ class Particle(IntFlag):
 
     def __str__(self) -> str:
         particle_count = len(self)
-        if GRAPHIC_STYLE == GraphicStyle.ARROW:
+        if GRAPHIC_STYLE == GraphicStyle.ARROW4:
             if particle_count >= 2:
                 if self == (Particle.E | Particle.W): return "→←"
                 if self == (Particle.N | Particle.S): return "↑↓"
