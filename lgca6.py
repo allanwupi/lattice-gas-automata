@@ -9,12 +9,13 @@ import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.06666666667
+DELAY_SECONDS = 0.05
 MAX_SIMULATION_TICKS = 6000
-OBSTACLE_RADIUS = 25
+OBSTACLE_RADIUS = 40
 OBSTACLE_SHAPE = "circle"
+VOID_OBSTACLE = True
 SMOOTH_FILTER = False
-SOURCE_CHANNEL = [0, 32]
+SOURCE_CHANNEL = [0, 1, 16, 32]
 
 class ColourScheme(StrEnum):
     BLACK = "\033[37;40m;"
@@ -173,6 +174,8 @@ class Lattice:
                     neighbours[Particle.SE] = wraparound(x+1,y+1)
                 self.neighbourhood[x][y] = neighbours
                 if obstacle(x-cx, y-cy):
+                    if VOID_OBSTACLE:
+                        continue
                     self.walls[x][y] = True
                     continue
                 if not SMOOTH_FILTER:
