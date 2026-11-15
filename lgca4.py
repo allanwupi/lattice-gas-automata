@@ -139,6 +139,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
+    CLEAR_SCREEN = CLEAR_LINE * ROWS
     spawn = [0,8,8,8]
     if len(sys.argv) > 1:
         spawn = []
@@ -159,10 +160,10 @@ def main():
             delay = DELAY_SECONDS - time.perf_counter() + start
             if delay > 0:
                 time.sleep(delay)
-            print(CLEAR_LINE*ROWS, end="")
+            print(CLEAR_SCREEN, end="")
     except KeyboardInterrupt:
         pass
-    print(f"{ColourScheme.RESET}{CLEAR_LINE * ROWS}", end="")
+    print(f"{ColourScheme.RESET}{CLEAR_SCREEN}", end="")
 
 
 if __name__ == "__main__":

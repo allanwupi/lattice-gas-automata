@@ -9,13 +9,13 @@ import sys, time, shutil, random
 
 
 # Simulation configuration
-DELAY_SECONDS = 0.05
+DELAY_SECONDS = 0.06666666667
 MAX_SIMULATION_TICKS = 6000
 OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
 EMITTER_WALL = True
 SMOOTH_FILTER = False
-SOURCE_CHANNEL = [0, 32, 32]
+SOURCE_CHANNEL = [0, 32]
 
 class ColourScheme(StrEnum):
     BLACK = "\033[37;40m;"
@@ -292,6 +292,7 @@ def main():
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
+    CLEAR_SCREEN = CLEAR_LINE * ROWS
     spawn = []
     if len(sys.argv) > 1:
         for x in sys.argv[1:]:
@@ -311,10 +312,10 @@ def main():
             delay = DELAY_SECONDS - time.perf_counter() + start
             if delay > 0:
                 time.sleep(delay)
-            print(CLEAR_LINE*ROWS, end="")
+            print(CLEAR_SCREEN, end="")
     except KeyboardInterrupt:
         pass
-    print(f"{ColourScheme.RESET}{CLEAR_LINE * ROWS}", end="")
+    print(f"{ColourScheme.RESET}{CLEAR_SCREEN}", end="")
 
 
 if __name__ == "__main__":
