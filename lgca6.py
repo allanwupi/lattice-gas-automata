@@ -173,7 +173,7 @@ if __name__ == "__main__":
     size = shutil.get_terminal_size()
     ROWS = size.lines-1
     COLS = size.columns // 2
-    spawn = [0,8,8,8]
+    spawn = []
     if len(sys.argv) > 1:
         spawn = []
         for x in sys.argv[1:]:
