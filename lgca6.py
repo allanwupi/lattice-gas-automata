@@ -12,15 +12,15 @@ import sys, shutil
 # Simulation configuration
 TARGET_FRAME_RATE = 15
 MAX_SIMULATION_TICKS = 6000
-OBSTACLE_RADIUS = 30
+OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = False
 SMOOTH_FILTER = True
-SOURCE_CHANNEL = [0, 32]
+SOURCE_CHANNEL = [32,]
 
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
-GRAPHIC_STYLE = GraphicStyle.BLOCK6
+GRAPHIC_STYLE = GraphicStyle.ARROW6
 
 
 class Particle(IntFlag):
@@ -165,7 +165,7 @@ class FHPLattice(Lattice):
 if __name__ == "__main__":
     size = shutil.get_terminal_size()
     ROWS = size.lines-1
-    COLS = size.columns // 2
+    COLS = size.columns // 2 - 1
     spawn = []
     if len(sys.argv) > 1:
         spawn = []
