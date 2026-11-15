@@ -13,7 +13,7 @@ python hpp_model.py [seed]
 
 Simulation runs at target 20 frames per second.
 
-Optionally specify a hex digit string for initial particle probabilities.
+Optionally specify a list of digits for initial particle velocities.
 - 0 = EMPTY (none)
 - 1 = NORTH (up)
 - 2 = SOUTH (down)
@@ -32,7 +32,7 @@ class Channel(IntFlag):
 ## FHP Model
 Uses a hexagonal lattice.
 
-Optionally specify a list of digits for initial particle probabilities.
+Optionally specify a list of digits for initial particle velocities.
 - 0 = EMPTY (none)
 - 1 = SOUTHEAST
 - 2 = SOUTHWEST

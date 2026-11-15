@@ -133,7 +133,13 @@ def main():
     CLEAR_LINE = "\x1b[1F\x1b[2K"  # ANSI escape code string
     spawn = [0,8,8,8]
     if len(sys.argv) > 1:
-        spawn = [int(x, 16) for x in sys.argv[1]]
+        spawn = []
+        for x in sys.argv[1:]:
+            value = int(x)
+            if value == 0:
+                spawn.extend([0]*len(x))
+            else:
+                spawn.append(value)
     world = random_world(ROWS, COLS, spawn=spawn)
     if COLOUR_SCHEME:
         print("\x1b[1;94;44m")
