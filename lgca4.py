@@ -30,6 +30,12 @@ COLOUR_SCHEME = ColourScheme.BLUE
 GRAPHIC_STYLE = GraphicStyle.BLOCK
 
 
+PARTICLE_DENSITY = {
+    GraphicStyle.ARROW: ["  ", "..", "++", "%%", "@@"],
+    GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▓▓", "██"]
+}
+
+
 class Particle(IntFlag):
     EMPTY = 0
     N = auto()
@@ -38,10 +44,6 @@ class Particle(IntFlag):
     W = auto()
 
     def __str__(self) -> str:
-        PARTICLE_DENSITY = {
-            GraphicStyle.ARROW: ["  ", "..", "++", "%%", "@@"],
-            GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▓▓", "██"]
-        }
         particle_count = len(self)
         if GRAPHIC_STYLE == GraphicStyle.ARROW:
             if particle_count >= 2:

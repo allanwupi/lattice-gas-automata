@@ -64,7 +64,7 @@ class Particle(IntFlag):
 
 
 class Lattice:
-    # WALL REST E NE NW W SW SE
+    # REST | E N NW | W SW SE
     COLLISION_RULES = {
         # 3x Type (a)
         0b0_100_100: [0b0_010_010, 0b0_001_001],
