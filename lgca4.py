@@ -45,7 +45,6 @@ class Particle(IntFlag):
         return PARTICLE_DENSITY[GRAPHIC_STYLE][particle_count]
 
 
-
 class HHPLattice(Lattice):
     PARTICLE = Particle
     EMPTY = Particle.EMPTY
