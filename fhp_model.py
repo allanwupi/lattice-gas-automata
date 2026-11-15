@@ -3,26 +3,40 @@
 Frisch-Hasslacher-Pomeau (FHP) model
 Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
-from dataclasses import dataclass
-from enum import IntFlag, auto
+from enum import Enum, IntFlag, auto
 from collections import Counter
 import sys, time, shutil, random
 
 
+# Simulation configuration
 DELAY_SECONDS = 0.06
 MAX_SIMULATION_TICKS = 2400
 OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
-GRAPHIC_STYLE = "block"
-COLOUR_SCHEME = "blue"
-SMOOTH_FILTER = False
 EMITTER_WALL = True
+SMOOTH_FILTER = False
+
+class GraphicStyle(Enum):
+    DOT = auto()
+    ARROW = auto()
+    BLOCK = auto()
+
+class ColourScheme(Enum):
+    BLACK = auto()
+    BLUE = auto()
+    DEEPBLUE = auto()
+    RED = auto()
+    WHITE = auto()
+
+# Customise appearance
+GRAPHIC_STYLE = GraphicStyle.BLOCK
+COLOUR_SCHEME = ColourScheme.BLUE
 
 
 PARTICLE_DENSITY = {
-    "dot": ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
-    "arrow": ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
-    "block": ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
+    GraphicStyle.DOT: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "$ "],
+    GraphicStyle.ARROW: ["  ", ". ", "++", "**", "##", "%%", "@@", "$$"],
+    GraphicStyle.BLOCK: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
 }
 
 
@@ -55,11 +69,7 @@ class Particle(IntFlag):
         return PARTICLE_DENSITY[GRAPHIC_STYLE][len(self)]
 
 
-@dataclass
 class Lattice:
-    particles: list[list[Particle]]
-    walls: list[list[bool]]
-
     # WALL REST E NE NW W SW SE
     COLLISION_RULES = {
         # 3x Type (a)
@@ -137,6 +147,7 @@ class Lattice:
 
     def __init__(self, rows: int, cols: int, spawn: list[int], wraprows: bool = False, wrapcols: bool = False):
         grid = [[Particle(random.choice(spawn)) for _ in range(cols)] for _ in range(rows)]
+        self.rows, self.cols = rows, cols
         cx, cy = rows//2, cols//2
         self.particles = [[Particle.EMPTY for _ in range(cols)] for _ in range(rows)]
         self.walls = [[False for _ in range(cols)] for _ in range(rows)]
@@ -195,16 +206,15 @@ class Lattice:
                 self.particles[x][y] = next_state
 
     def transport_step(self) -> None:
-        rows, cols = len(self.particles), len(self.particles[0])
         update = [[Particle.EMPTY for _ in row] for row in self.particles]
         def within_bounds(nx: int, ny: int):
-            return 0 <= nx < rows and 0 <= ny < cols and not self.walls[nx][ny]
+            return 0 <= nx < self.rows and 0 <= ny < self.cols and not self.walls[nx][ny]
         for x, line in enumerate(self.particles):
             for y, cell in enumerate(line):
                 if EMITTER_WALL:
                     if y == 0:
                         update[x][0] |= Particle.source()
-                    elif y == cols-1:
+                    elif y == self.cols-1:
                         continue
                 if self.walls[x][y]:
                     continue
@@ -293,16 +303,18 @@ def main():
                 spawn.append(value)
     world = Lattice(ROWS, COLS, spawn)
     match COLOUR_SCHEME:
-        case "blue":
+        case ColourScheme.BLUE:
             print("\x1b[1;44m", end="")
-        case "red":
+        case ColourScheme.DEEPBLUE:
+            print("\x1b[1;94;44m", end="")
+        case ColourScheme.RED:
             print("\x1b[1;30;41m", end="")
-        case "white":
+        case ColourScheme.WHITE:
             print("\x1b[1;47m", end="")
     try:
         for _ in range(MAX_SIMULATION_TICKS):
             start = time.perf_counter()
-            print(world,end="")
+            print(world, end="")
             world.collision_step()
             world.transport_step()
             delay = DELAY_SECONDS - time.perf_counter() + start
