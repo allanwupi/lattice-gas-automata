@@ -11,9 +11,8 @@ import sys, time, shutil, random
 # Simulation configuration
 DELAY_SECONDS = 0.06666666667
 MAX_SIMULATION_TICKS = 6000
-OBSTACLE_RADIUS = 20
+OBSTACLE_RADIUS = 25
 OBSTACLE_SHAPE = "circle"
-EMITTER_WALL = True
 SMOOTH_FILTER = False
 SOURCE_CHANNEL = [0, 32]
 
