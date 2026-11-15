@@ -5,7 +5,7 @@ Square lattice: 4 velocities
 '''
 from enum import IntFlag, auto
 from lattice import Lattice, simulate
-from graphics import ColourScheme, GraphicStyle
+from graphics import ColourScheme, GraphicStyle, PARTICLE_DENSITY
 import sys, shutil
 
 
@@ -22,12 +22,6 @@ SOURCE_CHANNEL = []
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
 GRAPHIC_STYLE = GraphicStyle.BLOCK4
-
-
-PARTICLE_DENSITY = {
-    GraphicStyle.ARROW4: ["  ", "..", "++", "%%", "@@"],
-    GraphicStyle.BLOCK4: ["  ", "░░", "▒▒", "▓▓", "██"]
-}
 
 
 class Particle(IntFlag):

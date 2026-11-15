@@ -15,3 +15,11 @@ class GraphicStyle(StrEnum):
     DOT6 = auto()
     ARROW6 = auto()
     BLOCK6 = auto()
+
+PARTICLE_DENSITY = {
+    GraphicStyle.ARROW4: ["  ", "..", "++", "%%", "@@"],
+    GraphicStyle.BLOCK4: ["  ", "░░", "▒▒", "▓▓", "██"],
+    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "@@"],
+    GraphicStyle.ARROW6: ["  ", ". ", "= ", "++", "**", "##", "%%", "@@"],
+    GraphicStyle.BLOCK6: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
+}

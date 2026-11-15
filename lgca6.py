@@ -5,7 +5,7 @@ Hexagonal lattice: 7 velocities (6 directions + stationary)
 '''
 from enum import IntFlag, auto
 from lattice import Lattice, simulate
-from graphics import ColourScheme, GraphicStyle
+from graphics import ColourScheme, GraphicStyle, PARTICLE_DENSITY
 import sys, shutil
 
 
@@ -21,13 +21,6 @@ SOURCE_CHANNEL = [0, 32]
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
 GRAPHIC_STYLE = GraphicStyle.BLOCK6
-
-
-PARTICLE_DENSITY = {
-    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "@@"],
-    GraphicStyle.ARROW6: ["  ", ". ", "= ", "++", "**", "##", "%%", "@@"],
-    GraphicStyle.BLOCK6: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
-}
 
 
 class Particle(IntFlag):
