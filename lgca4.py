@@ -127,8 +127,6 @@ class Lattice:
     def __str__(self) -> str:
         chars = []
         for x, row in enumerate(self.grid):
-            if x % 2 == 1:  # Odd row, offset by half
-                chars.append(" ")
             for y, cell in enumerate(row):
                 chars.append(str(cell))
             chars.append("\n")
@@ -170,8 +168,8 @@ def main():
                 time.sleep(delay)
             print(CLEAR_LINE*ROWS, end="")
     except KeyboardInterrupt:
-        print(CLEAR_LINE*ROWS, end="")
-    print("\x1b[0m")
+        pass
+    print(f"\x1b[0m{CLEAR_LINE * ROWS}", end="")
 
 
 if __name__ == "__main__":
