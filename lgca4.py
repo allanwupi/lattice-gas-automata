@@ -13,9 +13,9 @@ import sys, shutil
 TARGET_FRAME_RATE = 20
 MAX_SIMULATION_TICKS = 1200
 SMOOTH_FILTER = True
-OBSTACLE_RADIUS = 30
+OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
-VOID_OBSTACLE = True
+VOID_OBSTACLE = False
 SMOOTH_FILTER = True
 
 # Customise appearance
@@ -89,6 +89,11 @@ if __name__ == "__main__":
             if ',' in x:
                 source.extend([int(s) for s in x.split(',') if s])
                 continue
+            value = int(x)
+            if value == 0:
+                spawn.extend([0]*len(x))
+            else:
+                spawn.append(value)
     WORLD = HHPLattice(
         ROWS, COLS,
         spawn=spawn,

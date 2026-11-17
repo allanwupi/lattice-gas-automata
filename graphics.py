@@ -19,7 +19,7 @@ class GraphicStyle(StrEnum):
 PARTICLE_DENSITY = {
     GraphicStyle.ARROW4: ["  ", "..", "++", "%%", "@@"],
     GraphicStyle.BLOCK4: ["  ", "░░", "▒▒", "▓▓", "██"],
-    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "% ", "@ ", "@@"],
+    GraphicStyle.DOT6: ["  ", ". ", ": ", "+ ", "* ", "# ", "% ", "@ "],
     GraphicStyle.ARROW6: ["  ", ". ", "= ", "++", "**", "##", "%%", "@@"],
     GraphicStyle.BLOCK6: ["  ", "░░", "▒▒", "▒▒", "▓▓", "▓▓", "██", "██"]
 }

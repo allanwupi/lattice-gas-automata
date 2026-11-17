@@ -119,7 +119,7 @@ class Lattice(ABC):
             chars.append(self.row_prefix(x))
             for y, cell in enumerate(row):
                 if self.walls[x][y]:
-                    chars.append("  ")
+                    chars.append(str(self.EMPTY))
                 else:
                     chars.append(str(cell))
             chars.append("\n")

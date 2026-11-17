@@ -12,14 +12,14 @@ import sys, shutil
 # Simulation configuration
 TARGET_FRAME_RATE = 15
 MAX_SIMULATION_TICKS = 6000
-OBSTACLE_RADIUS = 20
+OBSTACLE_RADIUS = 25
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = False
 SMOOTH_FILTER = True
 
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
-GRAPHIC_STYLE = GraphicStyle.ARROW6
+GRAPHIC_STYLE = GraphicStyle.BLOCK6
 
 
 class Particle(IntFlag):
