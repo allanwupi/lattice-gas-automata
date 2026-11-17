@@ -16,7 +16,6 @@ OBSTACLE_RADIUS = 20
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = False
 SMOOTH_FILTER = True
-SOURCE_CHANNEL = [32,]
 
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
@@ -166,10 +165,13 @@ if __name__ == "__main__":
     size = shutil.get_terminal_size()
     ROWS = size.lines-1
     COLS = size.columns // 2 - 1
+    source = []
     spawn = []
     if len(sys.argv) > 1:
-        spawn = []
         for x in sys.argv[1:]:
+            if ',' in x:
+                source.extend([int(s) for s in x.split(',') if s])
+                continue
             value = int(x)
             if value == 0:
                 spawn.extend([0]*len(x))
@@ -178,7 +180,7 @@ if __name__ == "__main__":
     WORLD = FHPLattice(
         ROWS, COLS,
         spawn=spawn,
-        source=SOURCE_CHANNEL,
+        source=source,
         shape=OBSTACLE_SHAPE,
         radius=OBSTACLE_RADIUS,
         void=VOID_OBSTACLE,

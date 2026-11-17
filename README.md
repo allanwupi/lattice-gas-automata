@@ -8,12 +8,12 @@ Python simulation of lattice gas cellular automata
 
 ## HPP Model
 ```bash
-python lgca4.py [spawn]
+python lgca4.py [source] [spawn]
 ```
 
 Simulation runs at target 20 frames per second.
 
-Optionally specify a list of digits for initial particle velocities.
+Specify space-separated digits for initial particle velocities, comma-separated values for source particle velocities.
 - 0 = EMPTY (none)
 - 1 = NORTH (up)
 - 2 = SOUTH (down)
@@ -34,9 +34,9 @@ class Channel(IntFlag):
 python lgca6.py [spawn]
 ```
 
-This simulation comes with an obstacle in the centre (default shape is circle).
+Simulation runs at target 15 frames per second.
 
-Optionally specify a list of digits for initial particle velocities.
+In this model each lattice side (grid cell) has 7 channels that can be occupied by a particle:
 - 0 = EMPTY (none)
 - 1 = SOUTHEAST
 - 2 = SOUTHWEST
@@ -45,15 +45,3 @@ Optionally specify a list of digits for initial particle velocities.
 - 16 = NORTHEAST
 - 32 = EAST
 - 64 = REST (stationary)
-
-```python
-class FHPChannel(Flag):
-    EMPTY = 0
-    SE = auto()
-    SW = auto()
-    W = auto()
-    NW = auto()
-    NE = auto()
-    E = auto()
-    REST = auto()
-```

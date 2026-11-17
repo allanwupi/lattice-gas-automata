@@ -17,7 +17,6 @@ OBSTACLE_RADIUS = 30
 OBSTACLE_SHAPE = "circle"
 VOID_OBSTACLE = True
 SMOOTH_FILTER = True
-SOURCE_CHANNEL = []
 
 # Customise appearance
 COLOUR_SCHEME = ColourScheme.BLUE
@@ -83,19 +82,17 @@ if __name__ == "__main__":
     size = shutil.get_terminal_size()
     ROWS = size.lines-1
     COLS = size.columns // 2
-    spawn = [0,8,8,8]
+    source = []
+    spawn = []
     if len(sys.argv) > 1:
-        spawn = []
         for x in sys.argv[1:]:
-            value = int(x)
-            if value == 0:
-                spawn.extend([0]*len(x))
-            else:
-                spawn.append(value)
+            if ',' in x:
+                source.extend([int(s) for s in x.split(',') if s])
+                continue
     WORLD = HHPLattice(
         ROWS, COLS,
         spawn=spawn,
-        source=SOURCE_CHANNEL,
+        source=source,
         shape=OBSTACLE_SHAPE,
         radius=OBSTACLE_RADIUS,
         void=VOID_OBSTACLE,
