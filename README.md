@@ -36,7 +36,7 @@ python lgca6.py [spawn]
 
 Simulation runs at target 15 frames per second.
 
-In this model each lattice side (grid cell) has 7 channels that can be occupied by a particle:
+In this model each lattice site (grid cell) has 7 channels that can be occupied by a particle:
 - 0 = EMPTY (none)
 - 1 = SOUTHEAST
 - 2 = SOUTHWEST
