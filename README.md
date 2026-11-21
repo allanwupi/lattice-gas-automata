@@ -45,3 +45,5 @@ In this model each lattice side (grid cell) has 7 channels that can be occupied 
 - 16 = NORTHEAST
 - 32 = EAST
 - 64 = REST (stationary)
+
+![Example of FHP-III flow with circular obstacle](docs/fhp_model_flow.png)
